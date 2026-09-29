@@ -1,0 +1,108 @@
+# Production overlay. Use alongside the base file, never on its own:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# The base file is tuned for a laptop: it bind-mounts the source directory,
+# runs uvicorn with --reload, and publishes Postgres on a host port. Every one
+# of those is wrong on a server, so this overlay undoes them and adds what a
+# hosted deployment needs instead — TLS, health checks, log rotation, and an
+# APP_ENV that makes config.py refuse to start on a weak secret.
+
+services:
+  db:
+    # Not reachable from outside the compose network. Nothing but the three
+    # services needs it, and an exposed 5433 is an open invitation.
+    ports: !override []
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:?set POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set a real POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:?set POSTGRES_DB}
+    logging: &logging
+      driver: json-file
+      options: {max-size: "10m", max-file: "5"}
+
+  seed:
+    volumes: !override []
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    logging: *logging
+
+  api:
+    # No --reload: it watches the filesystem and restarts on any change.
+    command: uvicorn api:app --host 0.0.0.0 --port 8503 --workers 4
+    volumes: !override []
+    ports: !override []          # reached through Caddy, not directly
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8503/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    logging: *logging
+
+  customer-dashboard:
+    command: >
+      streamlit run app1.py --server.port 8501 --server.headless true
+      --server.address 0.0.0.0 --server.enableCORS false
+      --server.enableXsrfProtection true --browser.gatherUsageStats false
+    volumes: !override []
+    ports: !override []
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8501/_stcore/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging: *logging
+
+  associates-dashboard:
+    command: >
+      streamlit run app2.py --server.port 8502 --server.headless true
+      --server.address 0.0.0.0 --server.enableCORS false
+      --server.enableXsrfProtection true --browser.gatherUsageStats false
+    volumes: !override []
+    ports: !override []
+    environment:
+      APP_ENV: production
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request;urllib.request.urlopen('http://localhost:8502/_stcore/health')\""]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging: *logging
+
+  # The only service with a published port. Everything else is private to the
+  # compose network and reached through here over TLS.
+  proxy:
+    image: docker.io/library/caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      CUSTOMER_DOMAIN: ${CUSTOMER_DOMAIN:?set CUSTOMER_DOMAIN}
+      ASSOCIATES_DOMAIN: ${ASSOCIATES_DOMAIN:?set ASSOCIATES_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN:?set API_DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL for certificate renewal notices}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro,Z
+      - caddy_data:/data        # certificates — losing this re-issues them
+      - caddy_config:/config
+    depends_on:
+      - customer-dashboard
+      - associates-dashboard
+      - api
+    logging: *logging
+
+volumes:
+  caddy_data:
+  caddy_config:

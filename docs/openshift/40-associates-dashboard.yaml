@@ -1,0 +1,93 @@
+# Associates dashboard (app2.py), port 8502.
+#
+# Streamlit keeps per-session state in the server process, so the Route pins a
+# browser to one pod (`balance: source` + a cookie). Scale the replicas up
+# freely — without the annotations a user would bounce between pods and appear
+# to be logged out at random.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: associates-dashboard
+  labels:
+    app: associates-dashboard
+    app.kubernetes.io/part-of: capstone2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: associates-dashboard
+  template:
+    metadata:
+      labels:
+        app: associates-dashboard
+    spec:
+      containers:
+        - name: associates-dashboard
+          image: image-registry.openshift-image-registry.svc:5000/capstone2/capstone2:latest
+          command:
+            - streamlit
+            - run
+            - app2.py
+            - --server.port=8502
+            - --server.address=0.0.0.0
+            - --server.headless=true
+            - --server.enableCORS=false
+            - --server.enableXsrfProtection=true
+            - --browser.gatherUsageStats=false
+          ports:
+            - containerPort: 8502
+          envFrom:
+            - configMapRef: {name: capstone2-config}
+            - secretRef:    {name: capstone2-secrets}
+          env:
+            - name: DATABASE_URL
+              value: postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)
+          readinessProbe:
+            httpGet: {path: /_stcore/health, port: 8502}
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /_stcore/health, port: 8502}
+            initialDelaySeconds: 60
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 200m, memory: 512Mi}
+            limits:   {cpu: "1",  memory: 2Gi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: associates-dashboard
+  labels:
+    app: associates-dashboard
+    app.kubernetes.io/part-of: capstone2
+spec:
+  selector:
+    app: associates-dashboard
+  ports:
+    - name: http
+      port: 8502
+      targetPort: 8502
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: associates-dashboard
+  labels:
+    app: associates-dashboard
+    app.kubernetes.io/part-of: capstone2
+  annotations:
+    # Sticky sessions — required because Streamlit is stateful per connection.
+    haproxy.router.openshift.io/balance: source
+    haproxy.router.openshift.io/disable_cookies: "false"
+    # Streamlit holds a long-lived websocket; the default 30s would drop it.
+    haproxy.router.openshift.io/timeout: 300s
+spec:
+  to:
+    kind: Service
+    name: associates-dashboard
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

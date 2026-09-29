@@ -1,0 +1,46 @@
+# TLS termination and security headers for the hosted deployment.
+#
+# Caddy obtains and renews Let's Encrypt certificates automatically, so the
+# three services behind it never speak plain HTTP to a browser. Set the three
+# domains and an ACME contact address in .env:
+#
+#   CUSTOMER_DOMAIN=cust.example.com
+#   ASSOCIATES_DOMAIN=assoc.example.com
+#   API_DOMAIN=api.example.com
+#   ACME_EMAIL=you@example.com
+#
+# Subdomains rather than path prefixes: Streamlit assumes it owns the root of
+# its origin, and serving it under /customer/ means rewriting every asset URL
+# and websocket path for no gain.
+
+{
+	email {$ACME_EMAIL}
+}
+
+(hardening) {
+	header {
+		# The dashboards keep a session token in the query string. Without
+		# this, every outbound link would hand that token to a third party in
+		# the Referer header.
+		Referrer-Policy "no-referrer"
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		-Server
+	}
+}
+
+{$CUSTOMER_DOMAIN} {
+	import hardening
+	reverse_proxy customer-dashboard:8501
+}
+
+{$ASSOCIATES_DOMAIN} {
+	import hardening
+	reverse_proxy associates-dashboard:8502
+}
+
+{$API_DOMAIN} {
+	import hardening
+	reverse_proxy api:8503
+}

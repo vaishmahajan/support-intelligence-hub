@@ -1,0 +1,36 @@
+# Non-secret configuration. Secrets live in the `capstone2-secrets` Secret,
+# which is created imperatively (see docs/PROJECT_HANDBOOK.md §13.4 step 2) so
+# that no credential is ever committed to this repository.
+#
+# The three PUBLIC_*_URL values below are placeholders. OpenShift assigns Route
+# hostnames at creation time, so they are not knowable in advance — patch them
+# after `oc apply` (step 5) and restart the deployments. If you skip that,
+# cross-app links point at localhost and the API's CORS allow-list rejects the
+# dashboards.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: capstone2-config
+  labels:
+    app.kubernetes.io/part-of: capstone2
+data:
+  APP_ENV: "production"
+
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+
+  # Ignore any .env baked into the image; take configuration from the
+  # environment only. Without this a stale .env would override the ConfigMap.
+  DOTENV_DISABLE: "true"
+
+  PUBLIC_CUSTOMER_URL: "https://REPLACE-ME"
+  PUBLIC_ASSOCIATES_URL: "https://REPLACE-ME"
+  PUBLIC_API_URL: "https://REPLACE-ME"
+
+  JWT_EXPIRE_MINUTES: "60"
+  MAX_LOGIN_ATTEMPTS: "5"
+  LOCKOUT_SECONDS: "300"
+  HANDOFF_TTL_SECONDS: "60"
+
+  AI_ENDPOINT_URL: "https://your-granite-endpoint.example.com/v1"
+  AI_MODEL_ID: "ibm-granite/granite-3.1-8b-instruct"

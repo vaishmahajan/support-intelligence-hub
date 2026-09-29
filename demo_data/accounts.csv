@@ -1,0 +1,31 @@
+account_id,account_name,sector,account_notes,annual_revenue,contract_start_date,contract_end_date,support_tier,tam_assigned,region,employee_count,created_at
+ACC-0001,Northwind Defence Systems,Aerospace & Defense,Migration programme in progress across several business units.,87645000,2024-01-20,2027-01-19,Premium,,NASA,9200,2026-03-22 00:00:00
+ACC-0002,Aerolith Propulsion,Aerospace & Defense,Renewal conversation scheduled with the account team.,66202000,2023-10-05,2026-10-04,Premium,Yuki Okafor,EMEA,218400,2025-05-20 00:00:00
+ACC-0003,Meridian Trust Bank,Banking & Finance,Migration programme in progress across several business units.,47232000,2025-02-18,2026-02-18,Standard,Morgan Lindqvist,APAC,207300,2025-07-31 00:00:00
+ACC-0004,Calderon Capital Group,Banking & Finance,Standard commercial engagement.,31557000,2024-02-07,2027-02-06,Standard,Noor Ferreira,LATAM,227600,2025-03-12 00:00:00
+ACC-0005,Brightwater Credit Union,Banking & Finance,Renewal conversation scheduled with the account team.,24140000,2023-11-14,2026-11-13,Premium Plus,,NASA,16600,2024-12-23 00:00:00
+ACC-0006,Aldergrove University,Education & Research,Renewal conversation scheduled with the account team.,39811000,2023-07-03,2026-07-02,Premium Plus,,EMEA,140600,2024-07-14 00:00:00
+ACC-0007,Institut Pellworm,Education & Research,Renewal conversation scheduled with the account team.,29446000,2024-08-10,2025-08-10,Premium Plus,Mateo Adeyemi,NASA,112300,2025-06-19 00:00:00
+ACC-0008,Helios Grid Utilities,Energy & Utilities,Standard commercial engagement.,77247000,2024-01-04,2026-01-03,Premium,Theo Okafor,APAC,117900,2025-11-23 00:00:00
+ACC-0009,Tarnwick Power Authority,Energy & Utilities,Renewal conversation scheduled with the account team.,56355000,2022-11-27,2024-11-26,Standard,,LATAM,30400,2024-08-30 00:00:00
+ACC-0010,Department of Civic Records,Government,Renewal conversation scheduled with the account team.,6719000,2024-06-04,2025-06-04,Standard,Morgan Novak,APAC,158700,2025-04-14 00:00:00
+ACC-0011,Municipal Transit Authority,Government,Migration programme in progress across several business units.,22438000,2024-04-16,2026-04-16,Premium,Ravi Weber,APAC,243000,2024-08-10 00:00:00
+ACC-0012,Coastal Health Network,Healthcare & Pharma,Renewal conversation scheduled with the account team.,50521000,2024-04-26,2025-04-26,Standard,,NASA,244300,2024-11-10 00:00:00
+ACC-0013,Veritas Biopharma,Healthcare & Pharma,Renewal conversation scheduled with the account team.,76673000,2024-11-14,2027-11-14,Premium,,APAC,30600,2026-01-09 00:00:00
+ACC-0014,Ironvale Mutual Insurance,Insurance,Renewal conversation scheduled with the account team.,73056000,2022-10-11,2025-10-10,Premium,Amara Sato,EMEA,149000,2024-10-07 00:00:00
+ACC-0015,Stellar Assurance,Insurance,Standard commercial engagement.,56514000,2022-09-24,2025-09-23,Premium Plus,Noor Marchetti,APAC,36400,2025-05-19 00:00:00
+ACC-0016,Kestrel Manufacturing,Manufacturing,Standard commercial engagement.,71866000,2023-03-15,2024-03-14,Premium Plus,,APAC,217300,2025-06-08 00:00:00
+ACC-0017,Pemberton Steelworks,Manufacturing,Migration programme in progress across several business units.,59731000,2024-11-13,2027-11-13,Standard,Ingrid Adeyemi,NASA,238400,2024-04-20 00:00:00
+ACC-0018,Lumen Broadcasting,Media & Entertainment,Multi-region deployment; change windows are tightly controlled.,29088000,2023-08-10,2024-08-09,Premium,Freya Haddad,APAC,188200,2025-03-04 00:00:00
+ACC-0019,Orchard Street Media,Media & Entertainment,Multi-region deployment; change windows are tightly controlled.,79898000,2023-11-08,2026-11-07,Self-Support,Priya Novak,APAC,197500,2026-05-09 00:00:00
+ACC-0020,Drakemoor Petroleum,Oil & Gas,Renewal conversation scheduled with the account team.,50912000,2023-12-29,2024-12-28,Premium,Tobias Haddad,APAC,239200,2025-03-21 00:00:00
+ACC-0021,Sunflare Resources,Oil & Gas,Migration programme in progress across several business units.,13080000,2024-03-09,2027-03-09,Standard,,NASA,65000,2025-09-23 00:00:00
+ACC-0022,Greenfield Retail Group,Retail & E-Commerce,Multi-region deployment; change windows are tightly controlled.,12941000,2023-09-22,2025-09-21,Premium Plus,,NASA,235700,2024-11-27 00:00:00
+ACC-0023,Basketline Commerce,Retail & E-Commerce,Renewal conversation scheduled with the account team.,86860000,2024-11-22,2027-11-22,Premium Plus,,EMEA,207400,2024-03-25 00:00:00
+ACC-0024,Quillon Software,Technology,Migration programme in progress across several business units.,87171000,2024-04-27,2027-04-27,Standard,Idris Lindqvist,APAC,206400,2025-09-23 00:00:00
+ACC-0025,Anvil Cloud Systems,Technology,Migration programme in progress across several business units.,46698000,2024-05-30,2025-05-30,Premium,,NASA,40300,2025-06-27 00:00:00
+ACC-0026,Pinecrest Data Works,Technology,Migration programme in progress across several business units.,30643000,2024-11-04,2026-11-04,Premium Plus,Yuki Krishnan,EMEA,214600,2024-08-30 00:00:00
+ACC-0027,Cobalt Telecom,Telecommunications,Standard commercial engagement.,46951000,2023-05-04,2024-05-03,Premium Plus,,NASA,8600,2024-03-24 00:00:00
+ACC-0028,Skyreach Communications,Telecommunications,Renewal conversation scheduled with the account team.,88858000,2024-05-15,2027-05-15,Standard,Felix Moreau,LATAM,214600,2026-01-18 00:00:00
+ACC-0029,Harbourline Logistics,Transport & Logistics,Multi-region deployment; change windows are tightly controlled.,76540000,2023-08-24,2024-08-23,Self-Support,Idris Okafor,APAC,167300,2026-01-31 00:00:00
+ACC-0030,Redstone Freight,Transport & Logistics,Multi-region deployment; change windows are tightly controlled.,57608000,2023-10-17,2025-10-16,Premium Plus,Noor Krishnan,APAC,42200,2025-05-12 00:00:00

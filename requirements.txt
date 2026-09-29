@@ -1,0 +1,16 @@
+streamlit>=1.30.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.18.0
+sqlalchemy>=2.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+openpyxl>=3.1.0
+reportlab>=4.0.0
+python-jose[cryptography]>=3.3.0
+psycopg2-binary>=2.9.9
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+passlib[bcrypt]>=1.7.4
+bcrypt>=4.0.0,<4.1.0
+cryptography>=42.0.0
