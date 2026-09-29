@@ -1,0 +1,74 @@
+# PostgreSQL 16 as a StatefulSet with a 5Gi PVC.
+#
+# Good enough for a demo or an internal deployment. For anything with real
+# customer data, use a managed database instead and point DATABASE_URL at it —
+# a single-replica StatefulSet has no failover and no backup schedule.
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+    app.kubernetes.io/part-of: capstone2
+spec:
+  clusterIP: None          # headless — the StatefulSet owns the DNS name
+  selector:
+    app: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  labels:
+    app: postgres
+    app.kubernetes.io/part-of: capstone2
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: registry.redhat.io/rhel9/postgresql-16:latest
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRESQL_USER
+              valueFrom: {secretKeyRef: {name: capstone2-secrets, key: POSTGRES_USER}}
+            - name: POSTGRESQL_PASSWORD
+              valueFrom: {secretKeyRef: {name: capstone2-secrets, key: POSTGRES_PASSWORD}}
+            - name: POSTGRESQL_DATABASE
+              valueFrom: {secretKeyRef: {name: capstone2-secrets, key: POSTGRES_DB}}
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/pgsql/data
+          readinessProbe:
+            exec:
+              command: ["/bin/sh", "-c", "pg_isready -U $POSTGRESQL_USER -d $POSTGRESQL_DATABASE"]
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket: {port: 5432}
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits:   {cpu: "1",  memory: 1Gi}
+  volumeClaimTemplates:
+    - metadata:
+        name: pgdata
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

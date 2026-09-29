@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red Hat Support Operations Platform — Source Data Format</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;800;900&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rh-red:#EE0000; --rh-red-dark:#A30000; --ink:#151515; --ink-soft:#4D4D4D;
+  --line:#D2D2D2; --bg:#FFFFFF; --bg-soft:#F5F5F5; --bg-code:#1B1D21;
+  --blue:#0066CC; --green:#3E8635; --gold:#F0AB00; --purple:#5752D1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:1.5rem}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Red Hat Text","Red Hat Display",-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.68; -webkit-font-smoothing:antialiased;
+}
+.layout{display:grid; grid-template-columns:300px minmax(0,1fr); gap:0; max-width:1500px; margin:0 auto}
+
+/* ── sidebar ───────────────────────────────────────── */
+nav{
+  position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+  padding:1.6rem 1rem 3rem 1.4rem; border-right:1px solid var(--line);
+  background:var(--bg-soft); font-size:.86rem;
+}
+nav .brand{
+  font-family:"Red Hat Display",sans-serif; font-weight:900; font-size:1.02rem;
+  color:var(--rh-red); letter-spacing:-.01em; line-height:1.3; margin-bottom:.15rem;
+}
+nav .sub{color:var(--ink-soft); font-size:.76rem; margin-bottom:1.1rem}
+nav a{display:block; color:var(--ink-soft); text-decoration:none; padding:.26rem .6rem;
+      border-radius:5px; border-left:3px solid transparent}
+nav a:hover{background:#e8e8e8; color:var(--ink)}
+nav a.l1{font-weight:600; color:var(--ink); margin-top:.5rem}
+nav a.l1 b{display:inline-block; min-width:1.5em; color:var(--rh-red)}
+nav a.l2{padding-left:1.9rem; font-size:.81rem}
+nav a:target,nav a.active{border-left-color:var(--rh-red); background:#fff}
+
+/* ── content ───────────────────────────────────────── */
+main{padding:2.4rem 3.2rem 7rem; min-width:0}
+h1,h2,h3,h4{font-family:"Red Hat Display",sans-serif; letter-spacing:-.018em; line-height:1.22}
+h1{
+  font-size:2.35rem; font-weight:900; margin:3.4rem 0 1.4rem; padding-bottom:.5rem;
+  border-bottom:4px solid var(--rh-red); color:var(--ink);
+}
+h1:first-child{margin-top:0}
+h2{font-size:1.58rem; font-weight:800; margin:2.5rem 0 .9rem; color:var(--rh-red-dark)}
+h3{font-size:1.18rem; font-weight:700; margin:1.9rem 0 .6rem; color:var(--ink)}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--ink-soft)}
+.anchor{opacity:0; margin-left:.45rem; color:var(--line); text-decoration:none; font-weight:400}
+h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}
+p{margin:.85rem 0}
+a{color:var(--blue)} a:hover{color:var(--rh-red)}
+hr{border:0; border-top:1px solid var(--line); margin:2.6rem 0}
+hr + hr{display:none}
+ul,ol{margin:.85rem 0; padding-left:1.5rem}
+li{margin:.3rem 0}
+strong{font-weight:700}
+
+/* ── code ──────────────────────────────────────────── */
+code{
+  font-family:"Red Hat Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:.875em; background:#F0F0F0; padding:.13em .38em; border-radius:4px;
+  color:var(--rh-red-dark);
+}
+.codeblock{position:relative; margin:1.2rem 0}
+.codeblock .lang{
+  position:absolute; top:0; right:0; padding:.2rem .7rem; font-size:.68rem;
+  font-family:"Red Hat Mono",monospace; letter-spacing:.08em; text-transform:uppercase;
+  color:#8A8D90; background:#26292D; border-radius:0 8px 0 8px;
+}
+pre{
+  margin:0; background:var(--bg-code); color:#E8E8E8; padding:1.05rem 1.25rem;
+  border-radius:8px; overflow-x:auto; border-left:4px solid var(--rh-red);
+}
+pre code{background:none; color:inherit; padding:0; font-size:.855rem; line-height:1.6}
+
+/* ── tables ────────────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:1.3rem 0}
+table{border-collapse:collapse; width:100%; font-size:.92rem}
+th{
+  background:var(--ink); color:#fff; font-family:"Red Hat Display",sans-serif;
+  font-weight:700; text-align:left; padding:.62rem .85rem; font-size:.86rem;
+  letter-spacing:.01em;
+}
+td{padding:.55rem .85rem; border-bottom:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:#FAFAFA}
+tbody tr:hover{background:#FFF4F4}
+table table,td>table{font-size:.9rem}
+.headless td:first-child{font-weight:600; white-space:nowrap}
+
+/* ── callouts ──────────────────────────────────────── */
+blockquote{
+  margin:1.3rem 0; padding:.85rem 1.2rem; border-radius:0 8px 8px 0;
+  border-left:5px solid var(--blue); background:#F0F7FF;
+}
+blockquote.warn{border-left-color:var(--rh-red); background:#FFF5F5}
+blockquote.tip{border-left-color:var(--green); background:#F3FAF2}
+blockquote p{margin:.4rem 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+
+/* ── mermaid ───────────────────────────────────────── */
+.mermaid{
+  margin:1.6rem 0; padding:1.2rem; background:var(--bg-soft);
+  border:1px solid var(--line); border-radius:10px; text-align:center; overflow-x:auto;
+}
+.mermaid svg{max-width:100%; height:auto}
+
+/* ── cover ─────────────────────────────────────────── */
+div[align="center"]:first-of-type{
+  padding:3rem 2rem 2.2rem; margin-bottom:1rem;
+  background:linear-gradient(135deg,#1B1D21 0%,#3C0000 55%,#A30000 100%);
+  color:#fff; border-radius:12px;
+}
+div[align="center"]:first-of-type h1{
+  color:#fff; border-bottom:none; font-size:2.9rem; margin:0 0 .3rem;
+}
+div[align="center"]:first-of-type h3{color:#FFD6D6; font-weight:500; margin:0 0 1.1rem}
+div[align="center"]:first-of-type em{color:#FFC7C7}
+div[align="center"]:first-of-type .tablewrap{max-width:620px; margin:1.2rem auto 0}
+div[align="center"]:first-of-type table{font-size:.9rem}
+div[align="center"]:first-of-type th{background:rgba(255,255,255,.12)}
+div[align="center"]:first-of-type td{
+  border-bottom:1px solid rgba(255,255,255,.18); color:#fff;
+}
+div[align="center"]:first-of-type tbody tr:nth-child(even),
+div[align="center"]:first-of-type tbody tr:hover{background:rgba(255,255,255,.05)}
+div[align="center"]:first-of-type code{background:rgba(255,255,255,.15); color:#FFD6D6}
+div[align="center"]:first-of-type a{color:#FFC7C7}
+
+/* ── print ─────────────────────────────────────────── */
+@media print{
+  nav{display:none} .layout{grid-template-columns:1fr} main{padding:0}
+  h1{page-break-before:always; page-break-after:avoid}
+  h1:first-of-type{page-break-before:avoid}
+  h2,h3{page-break-after:avoid}
+  pre,table,.mermaid,blockquote{page-break-inside:avoid}
+  body{font-size:10.5pt}
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr} nav{position:static; height:auto; border-right:none;
+  border-bottom:1px solid var(--line)} main{padding:1.5rem 1.2rem 4rem}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <div class="brand">Data Format</div>
+  <div class="sub">Red Hat CEE BI Capstone #2</div>
+  <a class="l1" href="#source-data-format">Source Data Format</a>
+<a class="l2" href="#contents">Contents</a>
+<a class="l2" href="#the-five-files">The five files</a>
+<a class="l2" href="#1--accountscsv">1 · accounts.csv</a>
+<a class="l2" href="#2--associatesxlsx">2 · associates.xlsx</a>
+<a class="l2" href="#3--support_casesxlsx">3 · support_cases.xlsx</a>
+<a class="l2" href="#4--company_backgroundsjson-optional">4 · company_backgrounds.json (optional)</a>
+<a class="l2" href="#5--seed_usersjson-optional">5 · seed_users.json (optional)</a>
+<a class="l2" href="#controlled-vocabularies--the-strings-that-must-match-exactly">Controlled vocabularies — the strings that must match exactly</a>
+<a class="l2" href="#how-the-files-join">How the files join</a>
+<a class="l2" href="#loading-the-data">Loading the data</a>
+<a class="l2" href="#validating-before-you-load">Validating before you load</a>
+<a class="l2" href="#troubleshooting">Troubleshooting</a>
+<a class="l2" href="#see-also">See also</a>
+</nav>
+<main>
+<h1 id="source-data-format">Source Data Format<a class="anchor" href="#source-data-format">#</a></h1>
+<p><strong>Red Hat Support Operations Platform — Capstone #2</strong> How to bring your own data, what every column means, and how to load it.</p>
+<hr>
+<blockquote class="note"><p>🔒 <strong>No source data ships with this repository.</strong> The dataset this platform
+was built against is Red Hat customer and employee information — account
+names, annual revenues, contract dates, engineer names and email addresses,
+and free-text case descriptions. <code>data/</code> is in <code>.gitignore</code> and has never
+been committed. You clone the application; you supply the data.</p></blockquote>
+<p>You have three ways to get a running system. All three end at the same place — a populated <code>data/</code> directory and one <code>setup_database2.py</code> run.</p>
+<div class="tablewrap"><table><thead><tr><th></th><th>What you get</th><th>Effort</th></tr></thead><tbody><tr><td><strong>1. Use the demo set</strong></td><td>30 accounts · 25 engineers under 5 managers · 250 cases, entirely invented, committed to this repo in <code>demo_data/</code></td><td>one <code>cp</code></td></tr><tr><td><strong>2. Generate a bigger demo set</strong></td><td>same shapes, your chosen size</td><td>edit <code>tools/make_demo_data.py</code>, rerun</td></tr><tr><td><strong>3. Bring your own</strong></td><td>your real data</td><td>build three files to the spec below</td></tr></tbody></table></div>
+<div class="codeblock"><span class="lang">bash</span><pre><code class="language-bash"># Route 1 — the fastest path to a working app
+mkdir -p data
+cp demo_data/accounts.csv demo_data/support_cases.xlsx \
+   demo_data/associates.xlsx demo_data/company_backgrounds.json data/
+python setup_database2.py --from-source</code></pre></div>
+<p>That prints a row count per table and seeds two logins. Then <code>streamlit run app1.py</code>. Nothing else is required.</p>
+<hr>
+<h2 id="contents">Contents<a class="anchor" href="#contents">#</a></h2>
+<ul><li><a href="#the-five-files">The five files</a></li><li><a href="#1--accountscsv">1 · accounts.csv</a></li><li><a href="#2--associatesxlsx">2 · associates.xlsx</a></li><li><a href="#3--support_casesxlsx">3 · support_cases.xlsx</a></li><li><a href="#4--company_backgroundsjson-optional">4 · company_backgrounds.json <em>(optional)</em></a></li><li><a href="#5--seed_usersjson-optional">5 · seed_users.json <em>(optional)</em></a></li><li><a href="#controlled-vocabularies--the-strings-that-must-match-exactly">Controlled vocabularies — the strings that must match exactly</a></li><li><a href="#how-the-files-join">How the files join</a></li><li><a href="#loading-the-data">Loading the data</a></li><li><a href="#validating-before-you-load">Validating before you load</a></li><li><a href="#troubleshooting">Troubleshooting</a></li></ul>
+<hr>
+<h2 id="the-five-files">The five files<a class="anchor" href="#the-five-files">#</a></h2>
+<p>Everything goes in <code>data/</code>, at the repository root.</p>
+<div class="tablewrap"><table><thead><tr><th>File</th><th>Format</th><th>Required</th><th>What it is</th></tr></thead><tbody><tr><td><code>accounts.csv</code></td><td>CSV, UTF-8, header row</td><td>✅</td><td>One row per customer account</td></tr><tr><td><code>associates.xlsx</code></td><td>Excel, first sheet, header row</td><td>✅</td><td>One row per support engineer. Managers are referenced, not listed</td></tr><tr><td><code>support_cases.xlsx</code></td><td>Excel, first sheet, header row</td><td>✅</td><td>One row per support case</td></tr><tr><td><code>company_backgrounds.json</code></td><td>JSON object</td><td>⬜ optional</td><td>HQ city + one-line blurb per account</td></tr><tr><td><code>seed_users.json</code></td><td>JSON array</td><td>⬜ optional</td><td>Which two people get seeded logins</td></tr></tbody></table></div>
+<p><strong>Column names are normalised on load</strong> — <code>df.columns.str.strip().str.lower().str.replace(&quot; &quot;, &quot;_&quot;)</code>. So <code>Account ID</code>, <code>account id</code> and <code>account_id</code> all arrive as <code>account_id</code>. Case and spacing in your headers do not matter; spelling does.</p>
+<p><strong>Extra columns are carried through.</strong> <code>to_sql(..., if_exists=&quot;append&quot;)</code> writes whatever it is given, so an unexpected column will either land in the table or raise a database error, depending on your backend. Remove columns you do not need.</p>
+<hr>
+<h2 id="1--accountscsv">1 · accounts.csv<a class="anchor" href="#1--accountscsv">#</a></h2>
+<p>CSV, UTF-8, one header row, one row per account.</p>
+<div class="tablewrap"><table><thead><tr><th>Column</th><th>Type</th><th>Null?</th><th>Meaning</th><th>Notes</th></tr></thead><tbody><tr><td><code>account_id</code></td><td>text</td><td>❌</td><td>Primary key</td><td>Any stable string. The convention is <code>ACC-0001</code>; nothing enforces it</td></tr><tr><td><code>account_name</code></td><td>text</td><td>❌</td><td>Display name</td><td>Must be <strong>unique</strong> — used as the join key for <code>company_backgrounds.json</code> and shown everywhere</td></tr><tr><td><code>sector</code></td><td>text</td><td>❌</td><td>Industry</td><td>Free text, but drives a filter and a colour grouping — keep the set small and consistent</td></tr><tr><td><code>account_notes</code></td><td>text</td><td>✅</td><td>Free-text account context</td><td>Shown in Customer Intelligence. Leave blank rather than inventing</td></tr><tr><td><code>annual_revenue</code></td><td>integer</td><td>❌</td><td>Contract value in USD</td><td>Bucketed into <code>revenue_segment</code> on load — see below</td></tr><tr><td><code>contract_start_date</code></td><td>date</td><td>✅</td><td><code>YYYY-MM-DD</code></td><td>Parsed with <code>errors=&quot;coerce&quot;</code>; an unparseable value becomes <code>NULL</code>, not an error</td></tr><tr><td><code>contract_end_date</code></td><td>date</td><td>✅</td><td><code>YYYY-MM-DD</code></td><td>Drives the <em>renewal window</em> signal on the account card</td></tr><tr><td><code>support_tier</code></td><td>text</td><td>❌</td><td>Contract level</td><td><strong>Controlled vocabulary</strong> — see below. A value outside it scores 0 in the priority model</td></tr><tr><td><code>tam_assigned</code></td><td>text</td><td>✅</td><td>Technical Account Manager</td><td>Blank is normal and handled — the UI shows &quot;No TAM assigned&quot;</td></tr><tr><td><code>region</code></td><td>text</td><td>❌</td><td>Geography</td><td><strong>Controlled vocabulary</strong></td></tr><tr><td><code>employee_count</code></td><td>integer</td><td>✅</td><td>Customer headcount</td><td>Context only; no calculation depends on it</td></tr><tr><td><code>created_at</code></td><td>timestamp</td><td>✅</td><td>Record creation</td><td>Not used by any dashboard; keep it for lineage</td></tr></tbody></table></div>
+<p><strong>Derived on load — do not supply:</strong> <code>revenue_segment</code>, <code>hq_location</code>, <code>company_background</code>.</p>
+<p><code>revenue_segment</code> is bucketed from <code>annual_revenue</code> by <code>revenue_bucket()</code>:</p>
+<div class="tablewrap"><table><thead><tr><th><code>annual_revenue</code></th><th><code>revenue_segment</code></th></tr></thead><tbody><tr><td>null</td><td><code>Unknown</code></td></tr><tr><td>&lt; 1,000,000</td><td><code>&lt; $1M</code></td></tr><tr><td>&lt; 5,000,000</td><td><code>$1M - $5M</code></td></tr><tr><td>&lt; 10,000,000</td><td><code>$5M - $10M</code></td></tr><tr><td>&lt; 25,000,000</td><td><code>$10M - $25M</code></td></tr><tr><td>&lt; 50,000,000</td><td><code>$25M - $50M</code></td></tr><tr><td>≥ 50,000,000</td><td><code>&gt; $50M</code></td></tr></tbody></table></div>
+<p><strong>Example — two real rows from <code>demo_data/accounts.csv</code>:</strong></p>
+<div class="codeblock"><span class="lang">csv</span><pre><code class="language-csv">account_id,account_name,sector,account_notes,annual_revenue,contract_start_date,contract_end_date,support_tier,tam_assigned,region,employee_count,created_at
+ACC-0001,Northwind Defence Systems,Aerospace &amp; Defense,Migration programme in progress across several business units.,87645000,2024-01-20,2027-01-19,Premium,,NASA,9200,2026-03-22 00:00:00
+ACC-0002,Aerolith Propulsion,Aerospace &amp; Defense,Renewal conversation scheduled with the account team.,66202000,2023-10-05,2026-10-04,Premium,Yuki Okafor,EMEA,218400,2025-05-20 00:00:00</code></pre></div>
+<p>Note <code>ACC-0001</code> has an empty <code>tam_assigned</code>. That is deliberate — roughly 45% of the demo accounts have none, so you can see the empty-state handling.</p>
+<hr>
+<h2 id="2--associatesxlsx">2 · associates.xlsx<a class="anchor" href="#2--associatesxlsx">#</a></h2>
+<p>Excel, first sheet, one header row, one row per support engineer.</p>
+<div class="tablewrap"><table><thead><tr><th>Column</th><th>Type</th><th>Null?</th><th>Meaning</th><th>Notes</th></tr></thead><tbody><tr><td><code>associate_id</code></td><td>text</td><td>❌</td><td>Primary key</td><td>Convention <code>EMP-0001</code></td></tr><tr><td><code>associate_name</code></td><td>text</td><td>❌</td><td>Full name</td><td><strong>This is the join key to <code>support_cases.case_owner</code></strong> — it must match character for character</td></tr><tr><td><code>email</code></td><td>text</td><td>❌</td><td>Work address</td><td>Must end <code>@redhat.com</code> or the person cannot register — see <a href="#the-registration-gate">Registration</a></td></tr><tr><td><code>sbr</code></td><td>text</td><td>❌</td><td>Specialist Business Rule / team</td><td><strong>Controlled vocabulary</strong></td></tr><tr><td><code>shift</code></td><td>text</td><td>❌</td><td>Historical shift pattern</td><td>⚠️ This is <em>not</em> a rota. See the warning below</td></tr><tr><td><code>skill_level</code></td><td>text</td><td>❌</td><td>Seniority</td><td><strong>Controlled vocabulary</strong></td></tr><tr><td><code>hire_date</code></td><td>date</td><td>✅</td><td><code>YYYY-MM-DD</code></td><td>Drives tenure in the Team Readiness view</td></tr><tr><td><code>certifications</code></td><td>text</td><td>✅</td><td>Comma-separated list</td><td>Mined for skills — <code>RHCE</code>, <code>RHCSA</code>, <code>CKA</code>, <code>CKAD</code>, <code>Ansible</code>, <code>OpenShift</code>, <code>AWS</code>, <code>Azure</code>, <code>GCP</code> are recognised and add +3 to the matching skill</td></tr><tr><td><code>active</code></td><td>integer</td><td>❌</td><td><code>1</code> or <code>0</code></td><td></td></tr><tr><td><code>manager_name</code></td><td>text</td><td>❌</td><td>Their manager&#x27;s full name</td><td>Managers are <strong>not</strong> rows in this file — see the warning below</td></tr><tr><td><code>manager_email</code></td><td>text</td><td>❌</td><td>Their manager&#x27;s address</td><td>Must agree with <code>manager_name</code>, and must <strong>not</strong> also appear in the <code>email</code> column</td></tr></tbody></table></div>
+<blockquote class="warn"><p>⚠️ <strong><code>shift</code> is a historical pattern, never an availability signal.</strong>
+The dataset records which shift someone has worked, not whether they are at
+their desk right now. The platform therefore labels this column *&quot;shift on
+record&quot;* and calls the people it surfaces <strong>Potential SMEs</strong>, never
+&quot;Available Engineers&quot;. If you add a real rota, that is a new column and a new
+feature — do not overload this one, because an engineer woken at 3am by a
+wrong label is a real cost.</p></blockquote>
+<p><strong>Derived on load — do not supply:</strong> the entire <code>skills</code> table. The loader mines each engineer&#x27;s closed-case text, their <code>sbr</code> and their <code>certifications</code>, and writes their top 5 skills with a relevance score.</p>
+<blockquote class="warn"><p>⚠️ <strong>Managers are a separate population. Do not give them a row here.</strong>
+A manager is referenced by <code>manager_name</code> and <code>manager_email</code> and appears
+nowhere else in the file. This is not a stylistic choice — <code>_lookup_in_data()</code>
+resolves a manager by searching <code>manager_email</code>, and if the same address also
+turns up in the <code>email</code> column it treats that as a role conflict and returns
+<code>None</code>. The person then cannot register at all, as either role, with a
+message that points at neither cause. The 25 demo engineers report to 5
+managers who have no rows of their own, matching the real extract&#x27;s shape.</p></blockquote>
+<p><strong>Example row:</strong></p>
+<div class="tablewrap"><table><thead><tr><th>Column</th><th>Value</th></tr></thead><tbody><tr><td><code>associate_id</code></td><td><code>EMP-0001</code></td></tr><tr><td><code>associate_name</code></td><td><code>Theo Krishnan</code></td></tr><tr><td><code>email</code></td><td><code>theo.krishnan@redhat.com</code></td></tr><tr><td><code>sbr</code></td><td><code>RHOAI</code></td></tr><tr><td><code>shift</code></td><td><code>NASA</code></td></tr><tr><td><code>skill_level</code></td><td><code>Senior</code></td></tr><tr><td><code>hire_date</code></td><td><code>2019-04-03</code></td></tr><tr><td><code>certifications</code></td><td><code>OpenShift Administrator, Ansible Automation</code></td></tr><tr><td><code>active</code></td><td><code>1</code></td></tr><tr><td><code>manager_name</code></td><td><code>Adaeze Nwachukwu</code></td></tr><tr><td><code>manager_email</code></td><td><code>adaeze.nwachukwu@redhat.com</code></td></tr></tbody></table></div>
+<p>Adaeze Nwachukwu has no <code>associate_id</code> and no row of their own — they exist only as a manager reference, exactly as above.</p>
+<hr>
+<h2 id="3--support_casesxlsx">3 · support_cases.xlsx<a class="anchor" href="#3--support_casesxlsx">#</a></h2>
+<p>Excel, first sheet, one header row, one row per case. This is the file everything else revolves around.</p>
+<div class="tablewrap"><table><thead><tr><th>Column</th><th>Type</th><th>Null?</th><th>Meaning</th><th>Notes</th></tr></thead><tbody><tr><td><code>case_number</code></td><td>integer</td><td>❌</td><td>Primary key</td><td>Unique. The in-app importer refuses duplicates</td></tr><tr><td><code>account_id</code></td><td>text</td><td>❌</td><td>FK → <code>accounts.account_id</code></td><td>An unmatched value silently loses the account context — tier, region, TAM</td></tr><tr><td><code>account_name</code></td><td>text</td><td>❌</td><td>Denormalised copy</td><td>Kept so case views need no join. Must agree with <code>account_id</code></td></tr><tr><td><code>creation_date</code></td><td>datetime</td><td>❌</td><td>When the case opened</td><td>Drives <strong>age</strong>, and therefore the whole SLA model</td></tr><tr><td><code>severity</code></td><td>text</td><td>❌</td><td><strong>Controlled vocabulary</strong></td><td>Drives 40 of the 100 priority points and the SLA target</td></tr><tr><td><code>status</code></td><td>text</td><td>❌</td><td><strong>Controlled vocabulary</strong></td><td>Decides open vs closed, and whether the score is damped</td></tr><tr><td><code>csat_score</code></td><td>float</td><td>✅</td><td>1–5</td><td>Null on unresolved cases is normal and expected — 57% of the real extract is null. A null scores the neutral midpoint, never 0</td></tr><tr><td><code>sbr</code></td><td>text</td><td>❌</td><td>Team that owns it</td><td><strong>Controlled vocabulary</strong>. Whitespace is stripped on load</td></tr><tr><td><code>problem_statement</code></td><td>text</td><td>❌</td><td>Short symptom description</td><td>Grouped to find <a href="PROJECT_HANDBOOK.md#109-observed-historical-patterns">observed historical patterns</a> — so repeated wording is a <em>feature</em>, not sloppiness</td></tr><tr><td><code>description</code></td><td>text</td><td>✅</td><td>Long free text</td><td>Fed to TF-IDF similarity and skill mining</td></tr><tr><td><code>product_name</code></td><td>text</td><td>❌</td><td>Red Hat product</td><td>Free text, but the skill miner keyword-matches it</td></tr><tr><td><code>product_version</code></td><td>float</td><td>✅</td><td>e.g. <code>8.5</code></td><td>A float, not a string — <code>4.13</code> sorts numerically</td></tr><tr><td><code>sovereign_support</code></td><td>integer</td><td>❌</td><td><code>1</code> or <code>0</code></td><td>Data-residency flag; shown as a badge</td></tr><tr><td><code>business_hours</code></td><td>text</td><td>❌</td><td><strong>Controlled vocabulary</strong></td><td>A feature in the escalation-risk model</td></tr><tr><td><code>case_owner</code></td><td>text</td><td>❌</td><td>FK → <code>associates.associate_name</code></td><td><strong>By name, not ID.</strong> A typo here orphans the case from every team view</td></tr><tr><td><code>last_updated</code></td><td>datetime</td><td>❌</td><td>Last activity</td><td>Drives <strong>staleness</strong>, worth up to 15 priority points</td></tr><tr><td><code>resolution_date</code></td><td>datetime</td><td>✅</td><td>When it closed</td><td>Null for open cases. Must be ≥ <code>creation_date</code></td></tr><tr><td><code>escalated</code></td><td>integer</td><td>❌</td><td><code>1</code> or <code>0</code></td><td>Worth 10 priority points and it is the label the risk model is scored against</td></tr></tbody></table></div>
+<p><strong>Derived on load — do not supply:</strong> <code>time_to_resolve_hours</code>, computed as <code>(resolution_date − creation_date)</code> in hours, rounded to 2 dp, only where both are present.</p>
+<p><strong>Example row:</strong></p>
+<div class="tablewrap"><table><thead><tr><th>Column</th><th>Value</th></tr></thead><tbody><tr><td><code>case_number</code></td><td><code>3000000</code></td></tr><tr><td><code>account_id</code></td><td><code>ACC-0009</code></td></tr><tr><td><code>account_name</code></td><td><code>Tarnwick Power Authority</code></td></tr><tr><td><code>creation_date</code></td><td><code>2026-04-08 03:00:00</code></td></tr><tr><td><code>severity</code></td><td><code>Severity 1 (Urgent)</code></td></tr><tr><td><code>status</code></td><td><code>Closed</code></td></tr><tr><td><code>csat_score</code></td><td><em>(blank — closed without a survey response)</em></td></tr><tr><td><code>sbr</code></td><td><code>Virtualization</code></td></tr><tr><td><code>problem_statement</code></td><td><code>API gateway returning intermittent 503 responses</code></td></tr><tr><td><code>description</code></td><td><code>Customer reports API gateway returning intermittent 503 responses. Issue began after a routine change window…</code></td></tr><tr><td><code>product_name</code></td><td><code>Red Hat OpenShift Virtualization</code></td></tr><tr><td><code>product_version</code></td><td><code>7.7</code></td></tr><tr><td><code>sovereign_support</code></td><td><code>0</code></td></tr><tr><td><code>business_hours</code></td><td><code>Follow-the-Sun</code></td></tr><tr><td><code>case_owner</code></td><td><code>Priya Nilsen</code></td></tr><tr><td><code>last_updated</code></td><td><code>2026-06-01 20:00:00</code></td></tr><tr><td><code>resolution_date</code></td><td><code>2026-05-10 17:00:00</code></td></tr><tr><td><code>escalated</code></td><td><code>0</code></td></tr></tbody></table></div>
+<p>Note that <code>csat_score</code> is blank on a <em>closed</em> case. That is normal — customers do not always answer the survey — and it is why a missing CSAT scores the neutral midpoint rather than zero. Note also that <code>last_updated</code> is three weeks after <code>resolution_date</code>: someone added a note post-closure. The derived <code>time_to_resolve_hours</code> uses <code>resolution_date</code>, not <code>last_updated</code>, so it reads 782.0 h and is unaffected.</p>
+<h3 id="dates-and-the-reference-clock">Dates and the reference clock<a class="anchor" href="#dates-and-the-reference-clock">#</a></h3>
+<p>The dashboards do <strong>not</strong> use <code>datetime.now()</code> as &quot;today&quot;. <code>desk_reference_time()</code> takes the newest timestamp across <code>creation_date</code>, <code>last_updated</code> and <code>resolution_date</code>, then clamps it to the real clock so it can never run into the future:</p>
+<div class="codeblock"><span class="lang">python</span><pre><code class="language-python">min(max(newest timestamp in the data), pd.Timestamp.now())</code></pre></div>
+<p>A static extract therefore behaves consistently forever instead of ageing into a wall of breached SLAs.</p>
+<p>The consequence for your data: <strong>ages are measured relative to your newest row.</strong> If your extract stops in June and you load it in December, the app reports June as &quot;now&quot; and shows <em>&quot;data as of 11 Jun 2026&quot;</em> in the header. It is not stale-by-accident; it is stale-and-saying-so.</p>
+<hr>
+<h2 id="4--company_backgroundsjson-optional">4 · company_backgrounds.json <em>(optional)</em><a class="anchor" href="#4--company_backgroundsjson-optional">#</a></h2>
+<p>A flat object keyed by <code>account_name</code> — the <strong>name</strong>, not the ID, because this is the field a human filling it in will have to hand.</p>
+<div class="codeblock"><span class="lang">json</span><pre><code class="language-json">{
+  &quot;Northwind Defence Systems&quot;: [
+    &quot;Bristol, UK&quot;,
+    &quot;Defence systems integrator; long-running RHEL estate.&quot;
+  ],
+  &quot;Aerolith Propulsion&quot;: [
+    &quot;Toulouse, France&quot;,
+    &quot;Aerospace propulsion manufacturer.&quot;
+  ]
+}</code></pre></div>
+<p>Each value is a two-element array: <code>[hq_location, company_background]</code>. They populate the two columns of the same name on <code>accounts</code>.</p>
+<p>Behaviour when things are missing, all of it deliberate and none of it fatal:</p>
+<div class="tablewrap"><table><thead><tr><th>Situation</th><th>Result</th></tr></thead><tbody><tr><td>File absent</td><td>Both columns <code>NULL</code> for every account; a warning is not even printed</td></tr><tr><td>File present, account not listed</td><td>Both columns <code>NULL</code> for that account only</td></tr><tr><td>File malformed</td><td>Warning printed, treated as absent, load continues</td></tr></tbody></table></div>
+<p>The Customer Intelligence view degrades gracefully — it shows the account without the HQ line rather than failing.</p>
+<hr>
+<h2 id="5--seed_usersjson-optional">5 · seed_users.json <em>(optional)</em><a class="anchor" href="#5--seed_usersjson-optional">#</a></h2>
+<p>Which two people get a pre-created login. A JSON array of objects:</p>
+<div class="codeblock"><span class="lang">json</span><pre><code class="language-json">[
+  {&quot;email&quot;: &quot;you@redhat.com&quot;,       &quot;role&quot;: &quot;manager&quot;,   &quot;display_name&quot;: &quot;Your Name&quot;},
+  {&quot;email&quot;: &quot;colleague@redhat.com&quot;, &quot;role&quot;: &quot;associate&quot;, &quot;display_name&quot;: &quot;Their Name&quot;}
+]</code></pre></div>
+<div class="tablewrap"><table><thead><tr><th>Key</th><th>Required</th><th>Notes</th></tr></thead><tbody><tr><td><code>email</code></td><td>✅</td><td><strong>Must exist in <code>associates.xlsx</code></strong>, or the registration gate contradicts the seeded account</td></tr><tr><td><code>role</code></td><td>✅</td><td><code>manager</code> or <code>associate</code></td></tr><tr><td><code>display_name</code></td><td>✅</td><td>Shown in the header</td></tr></tbody></table></div>
+<blockquote class="note"><p>🔐 <strong>No password appears in this file, or in any file.</strong> Passwords come from
+the environment at load time — <code>SEED_MANAGER_PASSWORD</code> and
+<code>SEED_ASSOCIATE_PASSWORD</code>, defaulting to the documented development values
+<code>manager123</code> / <code>associate123</code>. Set both to something real before any
+deployment another person can reach; the defaults are published in the
+handbook and are therefore public.</p></blockquote>
+<p>If the file is absent, the two demo logins are seeded instead (<code>adaeze.nwachukwu@redhat.com</code> as manager, <code>theo.krishnan@redhat.com</code> as associate) — the first appears only in <code>manager_email</code>, the second only in <code>email</code>, so both pass the gate and the demo set is self-consistent out of the box.</p>
+<h3 id="the-registration-gate">The registration gate<a class="anchor" href="#the-registration-gate">#</a></h3>
+<p>Anyone else signs up through the app, and the gate is strict:</p>
+<ul><li>the address must end <code>@redhat.com</code></li><li><strong>it must already exist in <code>associates.xlsx</code></strong> — you cannot register a person</li></ul>
+<p>the organisation does not employ. An associate is matched on <code>email</code>; a manager is matched on <code>manager_email</code></p>
+<ul><li><strong>an address must not appear in both columns.</strong> That is read as a role</li></ul>
+<p>conflict and the registration is refused outright — the reason managers get no row of their own</p>
+<ul><li>a manager cannot register as an associate, or the reverse; the role is checked</li></ul>
+<p>against the data, not just the dropdown</p>
+<ul><li>admin has no registration path at all; it is one hardcoded account driven by</li></ul>
+<p><code>ADMIN_PASSWORD</code></p>
+<p>So your <code>associates.xlsx</code> is also your user directory. If someone cannot log in, that is the first file to check.</p>
+<hr>
+<h2 id="controlled-vocabularies--the-strings-that-must-match-exactly">Controlled vocabularies — the strings that must match exactly<a class="anchor" href="#controlled-vocabularies--the-strings-that-must-match-exactly">#</a></h2>
+<p>These are not suggestions. Scoring weights, colour maps and SLA targets are dictionaries keyed by these exact strings. A value outside the set does not crash anything — it silently scores <strong>zero</strong> and renders grey, which is far worse than an error because nobody notices.</p>
+<p><strong><code>support_cases.severity</code></strong> — the four-way split drives both the priority weight and the SLA target:</p>
+<div class="tablewrap"><table><thead><tr><th>Value</th><th>Priority points</th><th>Default SLA target</th></tr></thead><tbody><tr><td><code>Severity 1 (Urgent)</code></td><td>40</td><td>24 h</td></tr><tr><td><code>Severity 2 (High)</code></td><td>28</td><td>48 h</td></tr><tr><td><code>Severity 3 (Normal)</code></td><td>16</td><td>120 h</td></tr><tr><td><code>Severity 4 (Low)</code></td><td>8</td><td>240 h</td></tr></tbody></table></div>
+<p><strong><code>support_cases.status</code></strong> — six values, in three behavioural groups:</p>
+<div class="tablewrap"><table><thead><tr><th>Value</th><th>Group</th><th>Effect</th></tr></thead><tbody><tr><td><code>Open</code></td><td>actionable</td><td>in the queue at full weight</td></tr><tr><td><code>In Progress</code></td><td>actionable</td><td>in the queue at full weight</td></tr><tr><td><code>Waiting on Engineering</code></td><td>actionable</td><td>in the queue at full weight — it is still your move</td></tr><tr><td><code>Waiting on Customer</code></td><td>waiting</td><td>in the queue, score <strong>× 0.45</strong></td></tr><tr><td><code>Resolved</code></td><td>closed</td><td>excluded from the queue, included in history</td></tr><tr><td><code>Closed</code></td><td>closed</td><td>excluded from the queue, included in history</td></tr></tbody></table></div>
+<p><strong><code>accounts.support_tier</code></strong> — contributes to the priority score:</p>
+<div class="tablewrap"><table><thead><tr><th>Value</th><th>Priority points</th></tr></thead><tbody><tr><td><code>Premium Plus</code></td><td>10</td></tr><tr><td><code>Premium</code></td><td>7</td></tr><tr><td><code>Standard</code></td><td>3</td></tr><tr><td><code>Self-Support</code></td><td>0</td></tr></tbody></table></div>
+<p><strong>The rest</strong> — matched for filters, colours and grouping:</p>
+<div class="tablewrap"><table><thead><tr><th>Column</th><th>Allowed values</th></tr></thead><tbody><tr><td><code>accounts.region</code></td><td><code>APAC</code>, <code>EMEA</code>, <code>LATAM</code>, <code>NASA</code></td></tr><tr><td><code>associates.shift</code></td><td><code>APAC</code>, <code>EMEA</code>, <code>India</code>, <code>NASA</code></td></tr><tr><td><code>associates.skill_level</code></td><td><code>Associate</code>, <code>Mid-Level</code>, <code>Senior</code>, <code>Staff</code>, <code>Principal</code></td></tr><tr><td><code>support_cases.business_hours</code></td><td><code>Business Hours</code>, <code>Follow-the-Sun</code></td></tr><tr><td><code>sbr</code> <em>(both files)</em></td><td><code>ACM</code>, <code>Ansible</code>, <code>API Management</code>, <code>Ceph</code>, <code>Identity Management</code>, <code>JBoss Middleware</code>, <code>Kernel</code>, <code>Networking</code>, <code>OCS</code>, <code>RHOAI</code>, <code>Shift</code>, <code>Shift Hosted</code>, <code>Stack</code>, <code>Storage</code>, <code>SysMgmt</code>, <code>Virtualization</code></td></tr></tbody></table></div>
+<p><code>sector</code> and <code>product_name</code> are <strong>not</strong> controlled — they are free text. But <code>product_name</code> is keyword-matched by the skill miner, so naming a product <code>RHEL 9</code> instead of <code>Red Hat Enterprise Linux 9</code> still works (both contain a recognised keyword) while naming it <code>Linux Box</code> yields no inferred skills.</p>
+<hr>
+<h2 id="how-the-files-join">How the files join<a class="anchor" href="#how-the-files-join">#</a></h2>
+<p>Five joins. Two of them are on human names rather than IDs, and those are the two that break.</p>
+<div class="mermaid">graph LR
+    A[&quot;📄 accounts.csv&lt;br/&gt;&lt;b&gt;account_id&lt;/b&gt; PK&lt;br/&gt;account_name UQ&quot;]
+    S[&quot;📊 support_cases.xlsx&lt;br/&gt;&lt;b&gt;case_number&lt;/b&gt; PK&quot;]
+    E[&quot;📊 associates.xlsx&lt;br/&gt;&lt;b&gt;associate_id&lt;/b&gt; PK&lt;br/&gt;associate_name UQ&quot;]
+    B[&quot;📄 company_backgrounds.json&quot;]
+    U[&quot;📄 seed_users.json&quot;]
+
+    S --&gt;|&quot;account_id&quot;| A
+    S --&gt;|&quot;case_owner&lt;br/&gt;⚠ by NAME&quot;| E
+    M[&quot;👤 managers&lt;br/&gt;&lt;i&gt;no rows of their own —&lt;br/&gt;referenced only&lt;/i&gt;&quot;]
+    E --&gt;|&quot;manager_name&lt;br/&gt;manager_email&quot;| M
+    B -.-&gt;|&quot;key = account_name&quot;| A
+    U -.-&gt;|&quot;email&quot;| E
+
+    style A fill:#EE0000,color:#fff
+    style S fill:#EE0000,color:#fff
+    style E fill:#EE0000,color:#fff
+    style B fill:#F5F5F5
+    style U fill:#F5F5F5
+    style M fill:#F5F5F5</div>
+<div class="tablewrap"><table><thead><tr><th>Join</th><th>From</th><th>To</th><th>Breaks like this</th></tr></thead><tbody><tr><td>Case → Account</td><td><code>support_cases.account_id</code></td><td><code>accounts.account_id</code></td><td>Case loses tier, region and TAM. Priority drops by up to 10 points with no visible reason</td></tr><tr><td>Case → Engineer</td><td><code>support_cases.case_owner</code></td><td><code>associates.associate_name</code></td><td>Case vanishes from <em>My Cases</em> and <em>Team Queue</em>. <strong>The most common failure</strong></td></tr><tr><td>Engineer → Manager</td><td><code>associates.manager_name</code> + <code>manager_email</code></td><td><em>(a manager identity, not a row)</em></td><td>Inconsistent spelling splits one manager into two, and each sees half a team</td></tr><tr><td>Account → Background</td><td><code>company_backgrounds.json</code> key</td><td><code>accounts.account_name</code></td><td>HQ and blurb blank; nothing else</td></tr><tr><td>Login → Engineer</td><td><code>seed_users.json</code> email</td><td><code>associates.email</code></td><td>Seeded account exists but cannot pass the registration gate</td></tr></tbody></table></div>
+<blockquote class="warn"><p>⚠️ <strong><code>case_owner</code> and <code>manager_name</code> join on human names.</strong> <code>&quot;Theo Krishnan&quot;</code>
+and <code>&quot;Theo  Krishnan&quot;</code> are different people as far as pandas is concerned,
+and nothing will tell you — the case simply stops appearing in anyone&#x27;s
+queue. This is a weakness of the source schema rather than a design choice,
+and the <a href="#validating-before-you-load">validation script</a> below exists
+specifically to catch it.</p></blockquote>
+<hr>
+<h2 id="loading-the-data">Loading the data<a class="anchor" href="#loading-the-data">#</a></h2>
+<h3 id="bulk-load--the-whole-dataset">Bulk load — the whole dataset<a class="anchor" href="#bulk-load--the-whole-dataset">#</a></h3>
+<p><code>setup_database2.py</code> is a <strong>one-shot build, not a migration tool</strong>. On PostgreSQL it drops and re-creates the five tables; on SQLite it deletes and recreates the file. Anything a user entered through the app — case notes, desk state — is in separate tables and survives on PostgreSQL, but a SQLite rebuild starts from nothing.</p>
+<div class="codeblock"><span class="lang">bash</span><pre><code class="language-bash"># optional: set real seed passwords first
+export SEED_MANAGER_PASSWORD=&#x27;choose-something&#x27;
+export SEED_ASSOCIATE_PASSWORD=&#x27;choose-something-else&#x27;
+
+python setup_database2.py --from-source</code></pre></div>
+<p>Expected output:</p>
+<div class="codeblock"><pre><code>Connecting to PostgreSQL...
+  Cleared existing tables
+  Re-created schema
+  accounts: 30 rows loaded
+  support_cases: 250 rows loaded
+  associates: 25 rows loaded
+  skills: 125 rows loaded (25 associates)
+  indexes: 18 created
+  test users: 2 seeded (manager + associate)
+
+  Verification:
+    accounts: 30 rows
+    support_cases: 250 rows
+    associates: 25 rows
+    skills: 125 rows</code></pre></div>
+<p>If <code>data/</code> is empty the script exits before touching the database:</p>
+<div class="codeblock"><pre><code>ERROR: Missing source files: [PosixPath(&#x27;data/accounts.csv&#x27;), ...]</code></pre></div>
+<h3 id="incremental-load--adding-cases-through-the-app">Incremental load — adding cases through the app<a class="anchor" href="#incremental-load--adding-cases-through-the-app">#</a></h3>
+<p>Admins get a <strong>Data Management</strong> panel in <code>app2.py</code> with four tabs: <em>CSV Upload</em>, <em>Manual Entry</em>, <em>Delete Case</em>, <em>Export Data</em>. Managers and associates do not — <code>data_ingest</code> is <code>False</code> for both roles.</p>
+<p>The CSV importer needs <strong>six columns only</strong>:</p>
+<div class="codeblock"><pre><code>case_number, account_name, severity, status, product_name, case_owner</code></pre></div>
+<p>Any other columns from the full case schema are accepted and written; the six are the ones that must be present and non-empty. The importer then:</p>
+<ol><li>rejects the file outright if a required column is missing, naming which</li><li>drops rows where any required field is empty, telling you how many</li><li>drops rows whose <code>case_number</code> already exists, telling you how many</li><li>shows the surviving count and waits for you to press <strong>Import CSV</strong></li></ol>
+<p>Nothing is written until that last click. A file that is entirely duplicates reports <em>&quot;All rows already exist in the database. Nothing to import.&quot;</em> rather than silently doing nothing.</p>
+<p><em>Manual Entry</em> takes one case at a time from dropdowns populated by the existing data — so you cannot invent an account or an owner that does not exist, which closes the by-name join hole for anything entered this way. The case number is allocated as <code>MAX(case_number) + 1</code>.</p>
+<hr>
+<h2 id="validating-before-you-load">Validating before you load<a class="anchor" href="#validating-before-you-load">#</a></h2>
+<p>Run this against <code>data/</code> before the first load. It checks exactly the things that fail silently.</p>
+<div class="codeblock"><span class="lang">python</span><pre><code class="language-python"># tools/check_data.py  — not shipped; paste it, it is short on purpose
+import pandas as pd
+from pathlib import Path
+
+D = Path(&quot;data&quot;)
+acc = pd.read_csv(D / &quot;accounts.csv&quot;)
+eng = pd.read_excel(D / &quot;associates.xlsx&quot;)
+cas = pd.read_excel(D / &quot;support_cases.xlsx&quot;)
+for df in (acc, eng, cas):
+    df.columns = df.columns.str.strip().str.lower().str.replace(&quot; &quot;, &quot;_&quot;)
+
+SEV = {&quot;Severity 1 (Urgent)&quot;, &quot;Severity 2 (High)&quot;,
+       &quot;Severity 3 (Normal)&quot;, &quot;Severity 4 (Low)&quot;}
+STATUS = {&quot;Open&quot;, &quot;In Progress&quot;, &quot;Waiting on Customer&quot;,
+          &quot;Waiting on Engineering&quot;, &quot;Resolved&quot;, &quot;Closed&quot;}
+TIER = {&quot;Premium Plus&quot;, &quot;Premium&quot;, &quot;Standard&quot;, &quot;Self-Support&quot;}
+
+def report(label, bad):
+    bad = sorted(set(bad))
+    print(f&quot;{&#x27;OK  &#x27; if not bad else &#x27;FAIL&#x27;}  {label}&quot;
+          + (f&quot;  →  {bad[:5]}{&#x27; …&#x27; if len(bad) &gt; 5 else &#x27;&#x27;}&quot; if bad else &quot;&quot;))
+
+report(&quot;case.account_id not in accounts&quot;,
+       set(cas.account_id) - set(acc.account_id))
+report(&quot;case.case_owner not in associates&quot;,
+       set(cas.case_owner) - set(eng.associate_name))
+report(&quot;manager_email also in the email column (blocks registration)&quot;,
+       set(eng.manager_email.str.lower()) &amp; set(eng.email.str.lower()))
+report(&quot;manager_name / manager_email disagree&quot;,
+       [n for n, g in eng.groupby(&quot;manager_name&quot;)
+        if g.manager_email.nunique() &gt; 1])
+report(&quot;unknown severity&quot;, set(cas.severity) - SEV)
+report(&quot;unknown status&quot;, set(cas.status) - STATUS)
+report(&quot;unknown support_tier&quot;, set(acc.support_tier) - TIER)
+report(&quot;duplicate case_number&quot;,
+       cas.case_number[cas.case_number.duplicated()])
+report(&quot;duplicate account_name&quot;,
+       acc.account_name[acc.account_name.duplicated()])
+report(&quot;duplicate associate_name&quot;,
+       eng.associate_name[eng.associate_name.duplicated()])
+report(&quot;names with padding/double spaces&quot;,
+       [n for n in set(eng.associate_name) | set(cas.case_owner)
+        if isinstance(n, str) and (n != n.strip() or &quot;  &quot; in n)])
+report(&quot;resolution before creation&quot;,
+       cas.case_number[cas.resolution_date &lt; cas.creation_date])
+report(&quot;email not @redhat.com&quot;,
+       [e for e in eng.email if not str(e).endswith(&quot;@redhat.com&quot;)])
+
+print(f&quot;\n{len(acc)} accounts · {len(eng)} associates · {len(cas)} cases&quot;)
+newest = max(cas[c].max() for c in
+             (&quot;creation_date&quot;, &quot;last_updated&quot;, &quot;resolution_date&quot;))
+print(f&quot;reference clock will be: {min(newest, pd.Timestamp.now())}&quot;)</code></pre></div>
+<p>Every <code>FAIL</code> above is a silent failure at runtime, not a crash. That is the whole reason to run it.</p>
+<hr>
+<h2 id="troubleshooting">Troubleshooting<a class="anchor" href="#troubleshooting">#</a></h2>
+<div class="tablewrap"><table><thead><tr><th>Symptom</th><th>Cause</th><th>Fix</th></tr></thead><tbody><tr><td><code>ERROR: Missing source files: [...]</code></td><td><code>data/</code> is empty or misnamed</td><td><code>cp demo_data/* data/</code>, or check filenames exactly</td></tr><tr><td>App starts, every view is empty</td><td>Loader never ran, or ran against a different database</td><td>Re-run <code>setup_database2.py</code>; confirm <code>DATABASE_URL</code> matches what the app reads</td></tr><tr><td>An engineer&#x27;s <em>My Cases</em> is empty</td><td><code>case_owner</code> does not match <code>associate_name</code></td><td>Run the validator; look for padding and double spaces</td></tr><tr><td>A manager&#x27;s <em>Team Queue</em> is empty</td><td>No one has that person in <code>manager_name</code></td><td>Check the self-join</td></tr><tr><td>Every case shows priority ≈ severity only</td><td><code>account_id</code> is not matching, so tier scores 0</td><td>Run the validator</td></tr><tr><td>All cases grey, no severity colours</td><td><code>severity</code> strings are outside the vocabulary</td><td>Match them exactly, brackets and all</td></tr><tr><td>SLA targets look wrong for everything</td><td>Same cause — the target is looked up by the severity string</td><td>As above</td></tr><tr><td>Header date is months in the past</td><td>Correct behaviour — the clock is your newest <code>last_updated</code></td><td>Load fresher data, or accept it; the header says so honestly</td></tr><tr><td>Nobody can register</td><td>Their email is not in <code>associates.xlsx</code>, or is not <code>@redhat.com</code></td><td>Add the row and reload</td></tr><tr><td>Seeded login rejected</td><td><code>seed_users.json</code> names someone absent from <code>associates.xlsx</code></td><td>Make the two files agree</td></tr><tr><td>HQ and background blank everywhere</td><td><code>company_backgrounds.json</code> absent or keyed by <code>account_id</code></td><td>Key it by <code>account_name</code></td></tr><tr><td><code>skills</code> table has 0 rows</td><td>No <code>description</code> text and no recognised <code>certifications</code></td><td>Skills are mined from text; with none, there is nothing to mine</td></tr></tbody></table></div>
+<hr>
+<h2 id="see-also">See also<a class="anchor" href="#see-also">#</a></h2>
+<ul><li><strong><a href="PROJECT_HANDBOOK.md">Project Handbook</a></strong> — architecture, every feature,</li></ul>
+<p>and <a href="PROJECT_HANDBOOK.md#chapter-10--every-calculation-explained">Chapter 10</a>, which shows each formula worked through on a real row of the demo dataset</p>
+<ul><li><strong><a href="PROJECT_HANDBOOK.md#chapter-5--the-data">Chapter 5 — The Data</a></strong> — the</li></ul>
+<p>loader, the entity relationships and the derived columns</p>
+<ul><li><strong><a href="PROJECT_HANDBOOK.md#appendix-a--complete-inventory-databases-tables-tools--configs">Appendix A</a></strong></li></ul>
+<p>— every table, column, index and config file</p>
+<ul><li><strong><code>tools/make_demo_data.py</code></strong> — the generator; read it as an executable</li></ul>
+<p>specification of everything on this page</p>
+</main>
+</div>
+
+<script type="module">
+import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+mermaid.initialize({
+  startOnLoad: true,
+  theme: "base",
+  themeVariables: {
+    primaryColor: "#F5F5F5", primaryTextColor: "#151515", primaryBorderColor: "#8A8D90",
+    lineColor: "#6A6E73", secondaryColor: "#FFF4F4", tertiaryColor: "#FFFFFF",
+    fontFamily: '"Red Hat Text", sans-serif', fontSize: "14px"
+  },
+  flowchart: { curve: "basis", htmlLabels: true },
+  securityLevel: "loose"
+});
+</script>
+
+<script>
+// Highlight in the sidebar whichever chapter is currently on screen.
+(function () {
+  const links = new Map(
+    [...document.querySelectorAll('nav a')].map(a => [a.getAttribute('href').slice(1), a]));
+  const order = [...links.keys()];
+  const visible = new Set();
+
+  const observer = new IntersectionObserver(entries => {
+    for (const e of entries) {
+      e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id);
+    }
+    for (const a of links.values()) a.classList.remove('active');
+    const current = order.find(id => visible.has(id));
+    if (current) links.get(current).classList.add('active');
+  }, { rootMargin: '0px 0px -75% 0px' });
+
+  document.querySelectorAll('h1[id], h2[id]').forEach(h => observer.observe(h));
+})();
+</script>
+</body>
+</html>

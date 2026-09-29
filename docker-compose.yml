@@ -1,0 +1,89 @@
+services:
+  db:
+    image: docker.io/library/postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-capstone}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-change_me_in_production}
+      POSTGRES_DB: ${POSTGRES_DB:-capstone2}
+    ports:
+      - "${POSTGRES_PORT:-5433}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:Z
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-capstone} -d ${POSTGRES_DB:-capstone2}"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  seed:
+    build: .
+    command: python setup_database2.py
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-capstone}:${POSTGRES_PASSWORD:-change_me_in_production}@db:5432/${POSTGRES_DB:-capstone2}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - .:/app:z
+    restart: "no"
+
+  api:
+    build: .
+    command: uvicorn api:app --host 0.0.0.0 --port 8503 --reload
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8503}:8503"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-capstone}:${POSTGRES_PASSWORD:-change_me_in_production}@db:5432/${POSTGRES_DB:-capstone2}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app:z
+
+  customer-dashboard:
+    build: .
+    command: streamlit run app1.py --server.port 8501 --server.headless true --server.address 0.0.0.0
+    restart: unless-stopped
+    ports:
+      - "${CUSTOMER_DASHBOARD_PORT:-8501}:8501"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-capstone}:${POSTGRES_PASSWORD:-change_me_in_production}@db:5432/${POSTGRES_DB:-capstone2}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app:z
+
+  associates-dashboard:
+    build: .
+    command: streamlit run app2.py --server.port 8502 --server.headless true --server.address 0.0.0.0
+    restart: unless-stopped
+    ports:
+      - "${ASSOCIATES_DASHBOARD_PORT:-8502}:8502"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-capstone}:${POSTGRES_PASSWORD:-change_me_in_production}@db:5432/${POSTGRES_DB:-capstone2}
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    volumes:
+      - .:/app:z
+
+volumes:
+  pgdata:

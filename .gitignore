@@ -1,0 +1,29 @@
+.env
+
+# ── Source data — NEVER commit ────────────────────────────────────────────
+# data/ holds real customer and employee records: account names, revenues,
+# contract dates, engineer names and emails, and case descriptions. None of it
+# belongs in a public repository.
+#
+# Use demo_data/ instead (synthetic, safe, committed), or drop your own files
+# in here. Format: docs/DATA_FORMAT.md
+data/
+
+__pycache__/
+*.pyc
+*.pyo
+.claude/
+*.db
+*.sqlite3
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+node_modules/
+.DS_Store
+*.backup
+*_backup_*
+.sessions/
+*.docx
+.pytest_cache/

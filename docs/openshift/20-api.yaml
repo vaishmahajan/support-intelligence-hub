@@ -1,0 +1,77 @@
+# FastAPI service (api.py).
+#
+# No --reload here: it watches the filesystem and restarts on any change, which
+# is exactly wrong in a cluster. Four workers instead.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  labels:
+    app: api
+    app.kubernetes.io/part-of: capstone2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          # `oc new-build --name=capstone2` produces this ImageStream tag.
+          image: image-registry.openshift-image-registry.svc:5000/capstone2/capstone2:latest
+          command: ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8503", "--workers", "4"]
+          ports:
+            - containerPort: 8503
+          envFrom:
+            - configMapRef: {name: capstone2-config}
+            - secretRef:    {name: capstone2-secrets}
+          env:
+            - name: DATABASE_URL
+              value: postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@postgres:5432/$(POSTGRES_DB)
+          readinessProbe:
+            httpGet: {path: /health, port: 8503}
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: {path: /health, port: 8503}
+            initialDelaySeconds: 40
+            periodSeconds: 30
+          resources:
+            requests: {cpu: 100m, memory: 256Mi}
+            limits:   {cpu: "1",  memory: 1Gi}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api
+  labels:
+    app: api
+    app.kubernetes.io/part-of: capstone2
+spec:
+  selector:
+    app: api
+  ports:
+    - name: http
+      port: 8503
+      targetPort: 8503
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: api
+  labels:
+    app: api
+    app.kubernetes.io/part-of: capstone2
+spec:
+  to:
+    kind: Service
+    name: api
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

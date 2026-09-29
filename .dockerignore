@@ -1,0 +1,14 @@
+.env
+.git
+.gitignore
+.claude
+__pycache__
+*.pyc
+*.db
+*.sqlite3
+*.backup
+*_backup_*
+.DS_Store
+venv
+.venv
+node_modules
