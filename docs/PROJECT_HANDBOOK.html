@@ -33,6 +33,8 @@ nav .brand{
   color:var(--rh-red); letter-spacing:-.01em; line-height:1.3; margin-bottom:.15rem;
 }
 nav .sub{color:var(--ink-soft); font-size:.76rem; margin-bottom:1.1rem}
+nav a.home{padding:0 0 .55rem; font-size:.78rem; color:var(--ink-soft); border-left:none}
+nav a.home:hover{background:none; color:var(--rh-red)}
 nav a{display:block; color:var(--ink-soft); text-decoration:none; padding:.26rem .6rem;
       border-radius:5px; border-left:3px solid transparent}
 nav a:hover{background:#e8e8e8; color:var(--ink)}
@@ -151,6 +153,7 @@ div[align="center"]:first-of-type a{color:#FFC7C7}
 <body>
 <div class="layout">
 <nav>
+  <a class="home" href="index.html">&larr; All documents</a>
   <div class="brand">Project Handbook</div>
   <div class="sub">Red Hat CEE BI Capstone #2</div>
   <a class="l1" href="#chapter-1--what-this-project-is"><b>1</b> What This Project Is</a>
@@ -564,14 +567,14 @@ and email addresses, and free-text case descriptions. <code>data/</code> is in
 have never been in a commit. What you clone is the <em>application</em>; you supply
 the data.</p></blockquote>
 <p>You have two ways to get a running system:</p>
-<div class="tablewrap"><table><thead><tr><th></th><th><strong>Demo dataset</strong> <em>(recommended first run)</em></th><th><strong>Your own dataset</strong></th></tr></thead><tbody><tr><td>Where</td><td><code>demo_data/</code>, committed</td><td><code>data/</code>, gitignored, you create it</td></tr><tr><td>Contents</td><td>30 accounts · 25 engineers · 250 cases, entirely invented</td><td>whatever you have</td></tr><tr><td>Regenerate</td><td><code>python tools/make_demo_data.py</code></td><td>—</td></tr><tr><td>Schema</td><td>identical to the real one</td><td>must match — <a href="DATA_FORMAT.md"><code>docs/DATA_FORMAT.md</code></a></td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th></th><th><strong>Demo dataset</strong> <em>(recommended first run)</em></th><th><strong>Your own dataset</strong></th></tr></thead><tbody><tr><td>Where</td><td><code>demo_data/</code>, committed</td><td><code>data/</code>, gitignored, you create it</td></tr><tr><td>Contents</td><td>30 accounts · 25 engineers · 250 cases, entirely invented</td><td>whatever you have</td></tr><tr><td>Regenerate</td><td><code>python tools/make_demo_data.py</code></td><td>—</td></tr><tr><td>Schema</td><td>identical to the real one</td><td>must match — <a href="DATA_FORMAT.html"><code>docs/DATA_FORMAT.md</code></a></td></tr></tbody></table></div>
 <div class="codeblock"><span class="lang">bash</span><pre><code class="language-bash">cp demo_data/*.csv demo_data/*.xlsx demo_data/*.json data/   # or drop in your own
 python setup_database2.py --from-source</code></pre></div>
 <p><strong>The three files the loader requires</strong>, whichever route you take:</p>
 <div class="tablewrap"><table><thead><tr><th>File</th><th>Format</th><th>Contents</th><th>Demo rows</th></tr></thead><tbody><tr><td><code>data/accounts.csv</code></td><td>CSV</td><td>Enterprise customer accounts</td><td>30</td></tr><tr><td><code>data/support_cases.xlsx</code></td><td>Excel</td><td>Support cases</td><td>250</td></tr><tr><td><code>data/associates.xlsx</code></td><td>Excel</td><td>Support engineers</td><td>25</td></tr></tbody></table></div>
 <p>Two more are <strong>optional</strong> — missing either one is handled, not an error:</p>
 <div class="tablewrap"><table><thead><tr><th>File</th><th>Format</th><th>If absent</th></tr></thead><tbody><tr><td><code>data/company_backgrounds.json</code></td><td><code>{&quot;Account Name&quot;: [&quot;HQ city&quot;, &quot;one-line blurb&quot;]}</code></td><td><code>hq_location</code> and <code>company_background</code> stay <code>NULL</code>; Customer Intelligence simply shows less</td></tr><tr><td><code>data/seed_users.json</code></td><td><code>[{&quot;email&quot;, &quot;role&quot;, &quot;display_name&quot;}]</code></td><td>the two demo logins are seeded instead — <a href="#the-three-accounts">Chapter 6</a></td></tr></tbody></table></div>
-<p>Exact columns, types and nullability for all five: <strong><a href="DATA_FORMAT.md"><code>docs/DATA_FORMAT.md</code></a></strong>.</p>
+<p>Exact columns, types and nullability for all five: <strong><a href="DATA_FORMAT.html"><code>docs/DATA_FORMAT.md</code></a></strong>.</p>
 <p><strong>The loader:</strong> <code>setup_database2.py</code> reads those files and builds the database. It is not a migration tool — it is a one-shot build.</p>
 <div class="mermaid">graph LR
     F1[&quot;📄 accounts.csv&quot;] --&gt; S[&quot;⚙️ setup_database2.py&quot;]
@@ -798,11 +801,11 @@ def seed_test_users(engine):
     users = [(u[&quot;email&quot;], _pwd.hash(_pw_for.get(u[&quot;role&quot;], &quot;associate123&quot;)),
               u[&quot;role&quot;], u[&quot;display_name&quot;])
              for u in _load_seed_users()]</code></pre></div>
-<div class="tablewrap"><table><thead><tr><th>If you are running…</th><th><code>data/seed_users.json</code></th><th>Who gets seeded</th></tr></thead><tbody><tr><td>the demo dataset</td><td>absent</td><td><code>adaeze.nwachukwu@</code> / <code>theo.krishnan@</code> — the two above. The manager appears only in <code>manager_email</code>, the associate only in <code>email</code>; <a href="DATA_FORMAT.md#the-registration-gate">that distinction matters</a></td></tr><tr><td>your own dataset</td><td>you write it</td><td>whoever you name in it, who must exist in your <code>associates.xlsx</code></td></tr></tbody></table></div>
+<div class="tablewrap"><table><thead><tr><th>If you are running…</th><th><code>data/seed_users.json</code></th><th>Who gets seeded</th></tr></thead><tbody><tr><td>the demo dataset</td><td>absent</td><td><code>adaeze.nwachukwu@</code> / <code>theo.krishnan@</code> — the two above. The manager appears only in <code>manager_email</code>, the associate only in <code>email</code>; <a href="DATA_FORMAT.html#the-registration-gate">that distinction matters</a></td></tr><tr><td>your own dataset</td><td>you write it</td><td>whoever you name in it, who must exist in your <code>associates.xlsx</code></td></tr></tbody></table></div>
 <div class="codeblock"><span class="lang">json</span><pre><code class="language-json">[
   {&quot;email&quot;: &quot;you@redhat.com&quot;, &quot;role&quot;: &quot;manager&quot;, &quot;display_name&quot;: &quot;Your Name&quot;}
 ]</code></pre></div>
-<p>A malformed or unreadable file prints a warning and falls back to the demo pair rather than aborting the load. Format details: <a href="DATA_FORMAT.md"><code>docs/DATA_FORMAT.md</code></a>.</p>
+<p>A malformed or unreadable file prints a warning and falls back to the demo pair rather than aborting the load. Format details: <a href="DATA_FORMAT.html"><code>docs/DATA_FORMAT.md</code></a>.</p>
 <blockquote class="note"><p>🔐 <strong>Set both passwords before any deployment anyone else can reach.</strong>
 <code>manager123</code> / <code>associate123</code> are development defaults, printed in this
 handbook, and therefore public.
@@ -2037,8 +2040,10 @@ mermaid.initialize({
 <script>
 // Highlight in the sidebar whichever chapter is currently on screen.
 (function () {
+  // Chapter links only — the "All documents" link leaves the page.
   const links = new Map(
-    [...document.querySelectorAll('nav a')].map(a => [a.getAttribute('href').slice(1), a]));
+    [...document.querySelectorAll('nav a[href^="#"]')]
+      .map(a => [a.getAttribute('href').slice(1), a]));
   const order = [...links.keys()];
   const visible = new Set();
 

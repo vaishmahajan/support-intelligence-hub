@@ -68,6 +68,18 @@ _ITAL = re.compile(r"(?<![\*\w])\*([^\*\n]+?)\*(?!\*)")
 _LINK = re.compile(r"\[([^\]]+)\]\(([^)\s]+)\)")
 
 
+#: Cross-document links are written as `DATA_FORMAT.md` in the Markdown, which
+#: is what GitHub and an editor both want. GitHub Pages serves that raw, so on
+#: the rendered site the same link has to reach the HTML sibling instead.
+_MD_TO_HTML = {d.src: d.out for d in DOCUMENTS}
+
+
+def retarget(href):
+    """Point a link at another document's HTML build, preserving any anchor."""
+    base, sep, frag = href.partition("#")
+    return _MD_TO_HTML.get(base, base) + sep + frag
+
+
 def inline(text):
     """Escape, then apply the inline markup the handbook uses."""
     # Code spans are pulled out first so their contents are never treated as
@@ -80,7 +92,7 @@ def inline(text):
 
     text = _CODE.sub(stash, text)
     text = html.escape(text)
-    text = _LINK.sub(r'<a href="\2">\1</a>', text)
+    text = _LINK.sub(lambda m: f'<a href="{retarget(m.group(2))}">{m.group(1)}</a>', text)
     text = _BOLD.sub(r"<strong>\1</strong>", text)
     text = _ITAL.sub(r"<em>\1</em>", text)
     text = re.sub(r"\x00(\d+)\x00", lambda m: f"<code>{spans[int(m.group(1))]}</code>", text)
@@ -280,6 +292,8 @@ nav .brand{
   color:var(--rh-red); letter-spacing:-.01em; line-height:1.3; margin-bottom:.15rem;
 }
 nav .sub{color:var(--ink-soft); font-size:.76rem; margin-bottom:1.1rem}
+nav a.home{padding:0 0 .55rem; font-size:.78rem; color:var(--ink-soft); border-left:none}
+nav a.home:hover{background:none; color:var(--rh-red)}
 nav a{display:block; color:var(--ink-soft); text-decoration:none; padding:.26rem .6rem;
       border-radius:5px; border-left:3px solid transparent}
 nav a:hover{background:#e8e8e8; color:var(--ink)}
@@ -458,6 +472,7 @@ TEMPLATE = """<!DOCTYPE html>
 <body>
 <div class="layout">
 <nav>
+  <a class="home" href="index.html">&larr; All documents</a>
   <div class="brand">{brand}</div>
   <div class="sub">Red Hat CEE BI Capstone #2</div>
   {toc}
@@ -485,8 +500,10 @@ mermaid.initialize({{
 <script>
 // Highlight in the sidebar whichever chapter is currently on screen.
 (function () {{
+  // Chapter links only — the "All documents" link leaves the page.
   const links = new Map(
-    [...document.querySelectorAll('nav a')].map(a => [a.getAttribute('href').slice(1), a]));
+    [...document.querySelectorAll('nav a[href^="#"]')]
+      .map(a => [a.getAttribute('href').slice(1), a]));
   const order = [...links.keys()];
   const visible = new Set();
 
