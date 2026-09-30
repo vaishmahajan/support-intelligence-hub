@@ -8,8 +8,9 @@ A containerized analytics platform with two Streamlit dashboards, a FastAPI REST
 > move to live data. This README is the quick reference; the handbook is the
 > full story.
 >
-> For a styled, browsable version with rendered diagrams:
-> `python docs/build_handbook.py --open`
+> Styled and browsable, with the diagrams rendered:
+> **<https://vaishmahajan.github.io/support-intelligence-hub/>**
+> (or build it yourself with `python docs/build_handbook.py --open`).
 >
 > 📦 **No data ships with this repository.** Start with the synthetic
 > [`demo_data/`](demo_data/), or bring your own to the schema in
