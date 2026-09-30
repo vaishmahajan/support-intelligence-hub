@@ -5,7 +5,12 @@
     python docs/build_handbook.py --open     # ... and open them in a browser
 
 Documents are listed in DOCUMENTS. Adding one is a single line there; the
-styling, sidebar and diagram support come along for free.
+styling, sidebar, diagram support and a card on the index page all come along
+for free.
+
+This directory doubles as the GitHub Pages source, so the build also writes an
+`index.html` landing page — Pages serves a directory listing for nothing, and
+a bare 404 at the site root is a poor front door.
 
 There is one source of truth — the Markdown file. Maintaining a second
 hand-written HTML copy guarantees the two drift apart, so this script derives
@@ -26,17 +31,33 @@ import html
 import re
 import sys
 import webbrowser
+from collections import namedtuple
 from pathlib import Path
 
 DOCS = Path(__file__).resolve().parent
 
-#: (markdown source, html target, <title>, sidebar heading) — rendered in order.
+#: src = markdown input, out = html output, title = <title> and index card
+#: heading, brand = sidebar heading, blurb = one line on the index page.
+Doc = namedtuple("Doc", "src out title brand blurb")
+
 DOCUMENTS = [
-    ("PROJECT_HANDBOOK.md", "PROJECT_HANDBOOK.html",
-     "Red Hat Support Operations Platform — Project Handbook", "Project Handbook"),
-    ("DATA_FORMAT.md", "DATA_FORMAT.html",
-     "Red Hat Support Operations Platform — Source Data Format", "Data Format"),
+    Doc("PROJECT_HANDBOOK.md", "PROJECT_HANDBOOK.html",
+        "Project Handbook", "Project Handbook",
+        "The whole system from scratch — architecture, who it is for, every "
+        "feature and what it is for, the scoring models with worked examples "
+        "you can reproduce, and the commands to run, containerise and deploy "
+        "it."),
+    Doc("DATA_FORMAT.md", "DATA_FORMAT.html",
+        "Source Data Format", "Data Format",
+        "No customer data ships with this project. This is the column-by-column "
+        "spec for the four source files you supply yourself, how they join, the "
+        "vocabularies that must match exactly, and a validator to run before "
+        "you load."),
 ]
+
+#: Shown on the index page and in each document's sidebar.
+SITE_TITLE = "Red Hat Support Operations Platform"
+REPO_URL = "https://github.com/vaishmahajan/support-intelligence-hub"
 
 
 # ── inline ────────────────────────────────────────────────────────────────
@@ -374,6 +395,55 @@ div[align="center"]:first-of-type a{color:#FFC7C7}
 }
 """
 
+#: Only the index page needs these — it has no sidebar and no chapter flow.
+INDEX_CSS = """
+body{background:var(--bg-soft)}
+.wrap{max-width:860px; margin:0 auto; padding:4.5rem 1.5rem 6rem}
+.hero{
+  padding:3rem 2.4rem 2.6rem; border-radius:14px; color:#fff; margin-bottom:2.4rem;
+  background:linear-gradient(135deg,#1B1D21 0%,#3C0000 55%,#A30000 100%);
+}
+.hero h1{color:#fff; border-bottom:none; margin:0 0 .5rem; font-size:2.6rem}
+.hero p{color:#FFD6D6; margin:0; font-size:1.05rem; max-width:52ch}
+.card{
+  display:block; text-decoration:none; color:inherit; background:var(--bg);
+  border:1px solid var(--line); border-left:5px solid var(--rh-red);
+  border-radius:10px; padding:1.5rem 1.7rem; margin-bottom:1.2rem;
+  transition:box-shadow .15s ease, transform .15s ease;
+}
+.card:hover{box-shadow:0 6px 22px rgba(0,0,0,.09); transform:translateY(-2px)}
+.card h2{margin:0 0 .5rem; font-size:1.34rem}
+.card p{margin:0 0 .9rem; color:var(--ink-soft); font-size:.95rem}
+.card .go{color:var(--rh-red); font-weight:700; font-size:.9rem}
+.foot{margin-top:2.6rem; font-size:.9rem; color:var(--ink-soft)}
+"""
+
+INDEX_TEMPLATE = """<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title} — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;800;900&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>{css}</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>{title}</h1>
+    <p>Documentation for the Red Hat CEE BI Capstone #2 platform.</p>
+  </div>
+  {cards}
+  <p class="foot">Source, demo dataset and setup instructions:
+     <a href="{repo}">{repo}</a>.
+     No customer or employee data is published anywhere in this project.</p>
+</div>
+</body>
+</html>
+"""
+
 TEMPLATE = """<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -437,22 +507,44 @@ mermaid.initialize({{
 """
 
 
-def render(src_name, out_name, title, brand):
-    source, target = DOCS / src_name, DOCS / out_name
+def render(doc):
+    source, target = DOCS / doc.src, DOCS / doc.out
     if not source.exists():
         sys.exit(f"not found: {source}")
     body, toc = convert(source.read_text(encoding="utf-8"))
     target.write_text(TEMPLATE.format(css=CSS, toc=build_toc(toc), body=body,
-                                      title=html.escape(title),
-                                      brand=html.escape(brand)),
+                                      title=html.escape(f"{SITE_TITLE} — {doc.title}"),
+                                      brand=html.escape(doc.brand)),
                       encoding="utf-8")
     print(f"✓ {target}  ({target.stat().st_size / 1024:.0f} KB, {len(toc)} headings, "
           f"{body.count('class=\"mermaid\"')} diagrams)")
     return target
 
 
+def write_index():
+    """The GitHub Pages front door — one card per document in DOCUMENTS."""
+    cards = "\n".join(
+        f'<a class="card" href="{html.escape(d.out)}">'
+        f'<h2>{html.escape(d.title)}</h2>'
+        f'<p>{html.escape(d.blurb)}</p>'
+        f'<span class="go">Read it &rarr;</span></a>'
+        for d in DOCUMENTS
+    )
+    target = DOCS / "index.html"
+    target.write_text(INDEX_TEMPLATE.format(
+        css=CSS + INDEX_CSS, title=html.escape(SITE_TITLE), cards=cards,
+        repo=html.escape(REPO_URL)), encoding="utf-8")
+    print(f"✓ {target}  ({target.stat().st_size / 1024:.0f} KB, "
+          f"{len(DOCUMENTS)} documents)")
+    return target
+
+
 def main():
-    built = [render(*doc) for doc in DOCUMENTS]
+    built = [render(doc) for doc in DOCUMENTS]
+    built.insert(0, write_index())
+    # GitHub Pages runs Jekyll over this directory otherwise, which buys us
+    # nothing — every page here is already finished HTML — and can only break.
+    (DOCS / ".nojekyll").touch()
     if "--open" in sys.argv:
         for t in built:
             webbrowser.open(t.as_uri())
