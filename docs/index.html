@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Red Hat Support Operations Platform — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:wght@400;500;700;800;900&family=Red+Hat+Text:wght@400;500;600;700&family=Red+Hat+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rh-red:#EE0000; --rh-red-dark:#A30000; --ink:#151515; --ink-soft:#4D4D4D;
+  --line:#D2D2D2; --bg:#FFFFFF; --bg-soft:#F5F5F5; --bg-code:#1B1D21;
+  --blue:#0066CC; --green:#3E8635; --gold:#F0AB00; --purple:#5752D1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:1.5rem}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Red Hat Text","Red Hat Display",-apple-system,"Segoe UI",sans-serif;
+  font-size:16.5px; line-height:1.68; -webkit-font-smoothing:antialiased;
+}
+.layout{display:grid; grid-template-columns:300px minmax(0,1fr); gap:0; max-width:1500px; margin:0 auto}
+
+/* ── sidebar ───────────────────────────────────────── */
+nav{
+  position:sticky; top:0; align-self:start; height:100vh; overflow-y:auto;
+  padding:1.6rem 1rem 3rem 1.4rem; border-right:1px solid var(--line);
+  background:var(--bg-soft); font-size:.86rem;
+}
+nav .brand{
+  font-family:"Red Hat Display",sans-serif; font-weight:900; font-size:1.02rem;
+  color:var(--rh-red); letter-spacing:-.01em; line-height:1.3; margin-bottom:.15rem;
+}
+nav .sub{color:var(--ink-soft); font-size:.76rem; margin-bottom:1.1rem}
+nav a{display:block; color:var(--ink-soft); text-decoration:none; padding:.26rem .6rem;
+      border-radius:5px; border-left:3px solid transparent}
+nav a:hover{background:#e8e8e8; color:var(--ink)}
+nav a.l1{font-weight:600; color:var(--ink); margin-top:.5rem}
+nav a.l1 b{display:inline-block; min-width:1.5em; color:var(--rh-red)}
+nav a.l2{padding-left:1.9rem; font-size:.81rem}
+nav a:target,nav a.active{border-left-color:var(--rh-red); background:#fff}
+
+/* ── content ───────────────────────────────────────── */
+main{padding:2.4rem 3.2rem 7rem; min-width:0}
+h1,h2,h3,h4{font-family:"Red Hat Display",sans-serif; letter-spacing:-.018em; line-height:1.22}
+h1{
+  font-size:2.35rem; font-weight:900; margin:3.4rem 0 1.4rem; padding-bottom:.5rem;
+  border-bottom:4px solid var(--rh-red); color:var(--ink);
+}
+h1:first-child{margin-top:0}
+h2{font-size:1.58rem; font-weight:800; margin:2.5rem 0 .9rem; color:var(--rh-red-dark)}
+h3{font-size:1.18rem; font-weight:700; margin:1.9rem 0 .6rem; color:var(--ink)}
+h4{font-size:1rem; font-weight:700; margin:1.4rem 0 .5rem; color:var(--ink-soft)}
+.anchor{opacity:0; margin-left:.45rem; color:var(--line); text-decoration:none; font-weight:400}
+h1:hover .anchor,h2:hover .anchor,h3:hover .anchor{opacity:1}
+p{margin:.85rem 0}
+a{color:var(--blue)} a:hover{color:var(--rh-red)}
+hr{border:0; border-top:1px solid var(--line); margin:2.6rem 0}
+hr + hr{display:none}
+ul,ol{margin:.85rem 0; padding-left:1.5rem}
+li{margin:.3rem 0}
+strong{font-weight:700}
+
+/* ── code ──────────────────────────────────────────── */
+code{
+  font-family:"Red Hat Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  font-size:.875em; background:#F0F0F0; padding:.13em .38em; border-radius:4px;
+  color:var(--rh-red-dark);
+}
+.codeblock{position:relative; margin:1.2rem 0}
+.codeblock .lang{
+  position:absolute; top:0; right:0; padding:.2rem .7rem; font-size:.68rem;
+  font-family:"Red Hat Mono",monospace; letter-spacing:.08em; text-transform:uppercase;
+  color:#8A8D90; background:#26292D; border-radius:0 8px 0 8px;
+}
+pre{
+  margin:0; background:var(--bg-code); color:#E8E8E8; padding:1.05rem 1.25rem;
+  border-radius:8px; overflow-x:auto; border-left:4px solid var(--rh-red);
+}
+pre code{background:none; color:inherit; padding:0; font-size:.855rem; line-height:1.6}
+
+/* ── tables ────────────────────────────────────────── */
+.tablewrap{overflow-x:auto; margin:1.3rem 0}
+table{border-collapse:collapse; width:100%; font-size:.92rem}
+th{
+  background:var(--ink); color:#fff; font-family:"Red Hat Display",sans-serif;
+  font-weight:700; text-align:left; padding:.62rem .85rem; font-size:.86rem;
+  letter-spacing:.01em;
+}
+td{padding:.55rem .85rem; border-bottom:1px solid var(--line); vertical-align:top}
+tbody tr:nth-child(even){background:#FAFAFA}
+tbody tr:hover{background:#FFF4F4}
+table table,td>table{font-size:.9rem}
+.headless td:first-child{font-weight:600; white-space:nowrap}
+
+/* ── callouts ──────────────────────────────────────── */
+blockquote{
+  margin:1.3rem 0; padding:.85rem 1.2rem; border-radius:0 8px 8px 0;
+  border-left:5px solid var(--blue); background:#F0F7FF;
+}
+blockquote.warn{border-left-color:var(--rh-red); background:#FFF5F5}
+blockquote.tip{border-left-color:var(--green); background:#F3FAF2}
+blockquote p{margin:.4rem 0}
+blockquote p:first-child{margin-top:0} blockquote p:last-child{margin-bottom:0}
+
+/* ── mermaid ───────────────────────────────────────── */
+.mermaid{
+  margin:1.6rem 0; padding:1.2rem; background:var(--bg-soft);
+  border:1px solid var(--line); border-radius:10px; text-align:center; overflow-x:auto;
+}
+.mermaid svg{max-width:100%; height:auto}
+
+/* ── cover ─────────────────────────────────────────── */
+div[align="center"]:first-of-type{
+  padding:3rem 2rem 2.2rem; margin-bottom:1rem;
+  background:linear-gradient(135deg,#1B1D21 0%,#3C0000 55%,#A30000 100%);
+  color:#fff; border-radius:12px;
+}
+div[align="center"]:first-of-type h1{
+  color:#fff; border-bottom:none; font-size:2.9rem; margin:0 0 .3rem;
+}
+div[align="center"]:first-of-type h3{color:#FFD6D6; font-weight:500; margin:0 0 1.1rem}
+div[align="center"]:first-of-type em{color:#FFC7C7}
+div[align="center"]:first-of-type .tablewrap{max-width:620px; margin:1.2rem auto 0}
+div[align="center"]:first-of-type table{font-size:.9rem}
+div[align="center"]:first-of-type th{background:rgba(255,255,255,.12)}
+div[align="center"]:first-of-type td{
+  border-bottom:1px solid rgba(255,255,255,.18); color:#fff;
+}
+div[align="center"]:first-of-type tbody tr:nth-child(even),
+div[align="center"]:first-of-type tbody tr:hover{background:rgba(255,255,255,.05)}
+div[align="center"]:first-of-type code{background:rgba(255,255,255,.15); color:#FFD6D6}
+div[align="center"]:first-of-type a{color:#FFC7C7}
+
+/* ── print ─────────────────────────────────────────── */
+@media print{
+  nav{display:none} .layout{grid-template-columns:1fr} main{padding:0}
+  h1{page-break-before:always; page-break-after:avoid}
+  h1:first-of-type{page-break-before:avoid}
+  h2,h3{page-break-after:avoid}
+  pre,table,.mermaid,blockquote{page-break-inside:avoid}
+  body{font-size:10.5pt}
+}
+@media (max-width:1000px){
+  .layout{grid-template-columns:1fr} nav{position:static; height:auto; border-right:none;
+  border-bottom:1px solid var(--line)} main{padding:1.5rem 1.2rem 4rem}
+}
+
+body{background:var(--bg-soft)}
+.wrap{max-width:860px; margin:0 auto; padding:4.5rem 1.5rem 6rem}
+.hero{
+  padding:3rem 2.4rem 2.6rem; border-radius:14px; color:#fff; margin-bottom:2.4rem;
+  background:linear-gradient(135deg,#1B1D21 0%,#3C0000 55%,#A30000 100%);
+}
+.hero h1{color:#fff; border-bottom:none; margin:0 0 .5rem; font-size:2.6rem}
+.hero p{color:#FFD6D6; margin:0; font-size:1.05rem; max-width:52ch}
+.card{
+  display:block; text-decoration:none; color:inherit; background:var(--bg);
+  border:1px solid var(--line); border-left:5px solid var(--rh-red);
+  border-radius:10px; padding:1.5rem 1.7rem; margin-bottom:1.2rem;
+  transition:box-shadow .15s ease, transform .15s ease;
+}
+.card:hover{box-shadow:0 6px 22px rgba(0,0,0,.09); transform:translateY(-2px)}
+.card h2{margin:0 0 .5rem; font-size:1.34rem}
+.card p{margin:0 0 .9rem; color:var(--ink-soft); font-size:.95rem}
+.card .go{color:var(--rh-red); font-weight:700; font-size:.9rem}
+.foot{margin-top:2.6rem; font-size:.9rem; color:var(--ink-soft)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Red Hat Support Operations Platform</h1>
+    <p>Documentation for the Red Hat CEE BI Capstone #2 platform.</p>
+  </div>
+  <a class="card" href="PROJECT_HANDBOOK.html"><h2>Project Handbook</h2><p>The whole system from scratch — architecture, who it is for, every feature and what it is for, the scoring models with worked examples you can reproduce, and the commands to run, containerise and deploy it.</p><span class="go">Read it &rarr;</span></a>
+<a class="card" href="DATA_FORMAT.html"><h2>Source Data Format</h2><p>No customer data ships with this project. This is the column-by-column spec for the four source files you supply yourself, how they join, the vocabularies that must match exactly, and a validator to run before you load.</p><span class="go">Read it &rarr;</span></a>
+  <p class="foot">Source, demo dataset and setup instructions:
+     <a href="https://github.com/vaishmahajan/support-intelligence-hub">https://github.com/vaishmahajan/support-intelligence-hub</a>.
+     No customer or employee data is published anywhere in this project.</p>
+</div>
+</body>
+</html>
